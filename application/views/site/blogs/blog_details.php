@@ -1,4 +1,4 @@
-<?php //print_r($getBlogDetails[0]->blog_likes_id);die;                                  ?>
+<?php //print_r($getBlogDetails[0]->blog_likes_id);die;                                          ?>
 
 <?php $user = $this->ion_auth->user()->row(); ?>
 <div class="fluid-containter">
@@ -12,20 +12,22 @@
             <h4 style="display: inline">Written By: <?php echo $getBlogDetails->username ?></h4>
             <p  id="like_text" class="like ">Like this Blog</p>  
             <i id="like_icon" class="far fa-thumbs-up like" style="margin: 0"></i>
-            <div><p style="color:blue;margin-right: -10%"><strong>Likes:</strong> <?php echo $totalLikes ?></p>
+            <div><p style="color:blue;margin-right: -10%"><strong>Likes:</strong> <?php echo $totalLikes?></p>
             </div>
             <?php if (!empty($getBlogDetails->cover_pic_path)) { ?>      
                 <div class="image-con">
                     <img class="top-row img"  src="<?php echo base_url($getBlogDetails->cover_pic_path) ?>">
                 </div> 
             <?php } ?>
+            </br>
+            </br>            
             <p><strong>Published On:</strong> <?php echo date('m/d/y', strtotime($getBlogDetails->publish_date)) ?></p>
             <!--<p>Destination Tags: <?php
 //                foreach ($getBlogLocationsDetails as $location) {
 //                    echo $location->location
             ?> </p>-->
             <p><strong>Dates of Trip:</strong> <?php echo $getBlogDetails->blog_dates ?></p>
-            <p><strong>Destination:</strong>
+            <p><strong>Destination Tags:</strong>
                 <?php
                 $locationString = '';
                 foreach ($getBlogLocationsDetails as $location) {
@@ -35,25 +37,41 @@
                 echo $locationString;
                 ?>
             </p>
-            <div class="col-md-4 table-of-contents">
-                <h3>Table of Contents</h3>
-                <a href="#blog-post">Blog Post</a>  </br>
-                <?php if (!empty($getBlogAttractionsDetails)) { ?>
-                    <a href="#attractions">Top Attraction</a>  </br>
-                <?php } ?>
-                <?php if (!empty($getBlogRestaurnatsDetails)) { ?>
-                    <a href="#restaurants">Top Restaurants</a>  </br>
-                <?php } ?>
-                <?php if (!empty($getBlogAdviceDetails)) { ?>
-                    <a href="#advice">Advice</a>  </br>
-                <?php } ?>
-                <?php if (!empty($getBlogDetails->best_day)) { ?>
-                    <a href="#best-day">Best Day of My Trip</a>  </br>
-                <?php } ?>
-                <?php if (!empty($getBlogPhotosDetails)) { ?>
-                    <a href="#photos">Photos</a>  </br>
-                <?php } ?>
+            <?php if ($getBlogDetails->country_name != "3+") { ?>
+                <div align="center" class="col-md-10" style="margin: 25px 0;">
+                    <h1 ><?php
+                        if ($getBlogDetails->country == '230') {
+                            echo $getBlogDetails->state_name.", USA";
+                        } else {
+                            echo $getBlogDetails->country_name.", ". $getBlogDetails->continent_name;
+                        }
+                        ?> </h1>
+                </div>
+            <?php } ?>
+            <div > 
+                <div class="col-md-4 table-of-contents" style="display:inline-block;vertical-align:top;">
+                    <h3>Table of Contents</h3>
+                    <a href="#blog-post">Blog Post</a>  </br>
+                    <?php if (!empty($getBlogAttractionsDetails)) { ?>
+                        <a href="#attractions">Top Attraction</a>  </br>
+                    <?php } ?>
+                    <?php if (!empty($getBlogRestaurnatsDetails)) { ?>
+                        <a href="#restaurants">Top Restaurants</a>  </br>
+                    <?php } ?>
+                    <?php if (!empty($getBlogAdviceDetails)) { ?>
+                        <a href="#advice">Advice</a>  </br>
+                    <?php } ?>
+                    <?php if (!empty($getBlogDetails->best_day)) { ?>
+                        <a href="#best-day">Best Day of My Trip</a>  </br>
+                    <?php } ?>
+                    <?php if (!empty($getBlogPhotosDetails)) { ?>
+                        <a href="#photos">Photos</a>  </br>
+                    <?php } ?>
 
+                </div>
+                <div style="display:inline-block" class="col-md-6" >
+                    <div id="chartdiv" ></div>
+                </div>
             </div>
             <div id="blog-post" class="spacer">
                 <?php echo $getBlogDetails->blog_summary ?>
@@ -174,7 +192,7 @@
             </div>             
             <div class="spacer send-message">
                 <div class=" ">
-                    <h3>Send a message to the Author of this blog.</h3>
+                    <h3>Send a message to <?php echo $getBlogDetails->username ?>.</h3>
                     <p>Have a question or comment about this blog? Have a comment about something random? Send it here!</p>
                     <form class="top-row" id="messgae-form">
                         <label>Sending a message about this blog?</label>
@@ -208,11 +226,11 @@
                 </div>
                 <h3>About the Author</h3>
                 <h5><?php echo $getBlogDetails->username ?></h5>
-                <p><?php echo character_limiter($getBlogDetails->about, 100, '<a href="#"> more...</a>') ?></p>
+                <p><?php echo character_limiter($getBlogDetails->about, 100, '<a href="'. base_url().'bloggers/details/'.$getBlogDetails->id.'"> read more...</a>') ?></p>
                 <?php if (sizeof($getAllBLogsByUser) > 1) { ?>
                     <h5>Other Blogs by <?php echo $getBlogDetails->username ?></h5>
                     <ul style="text-align: left">
-                        <?php for ($i = 0; $i < 3 && $i + 1 < sizeof($getAllBLogsByUser); $i++) {      //    $randd = (rand(10,100));   ?>
+                        <?php for ($i = 0; $i < 3 && $i + 1 < sizeof($getAllBLogsByUser); $i++) {      //    $randd = (rand(10,100));    ?>
                             <li><a href="<?php echo base_url() . 'blog-details/' . $getAllBLogsByUser[$i]->blog_id ?>"><?php echo $getAllBLogsByUser[$i]->blog_title ?> </a> </li>
 
                         <?php } ?>
@@ -250,6 +268,7 @@
     </div>
 </div>
 
+
 <div class="modal fade image-modal-content center" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog image-modal-dialog " role="document">
         <div class="modal-content image-modal-content">
@@ -274,6 +293,7 @@
         </div>
     </div>
 </div>
+<div id='mapdiv'></div>
 <!--<script type="text/javascript" src="<?php echo base_url() . 'bower_components/amcharts4/core.js'; ?>"></script>
 
 <script type="text/javascript" src="<?php echo base_url() . 'bower_components/amcharts4/maps.js'; ?>"></script>-->
@@ -295,7 +315,7 @@
         // modal.find('.modal-body #title').val($('#myImgName' + num).text());
         //     /document.write(img.src);
         modal.find('#modal-image').attr("src", img.src);
-        //$('#modal-form').attr('action',"<?php //echo base_url() . 'profile/blogs/image/' . $blogId                          ?>"  );
+        //$('#modal-form').attr('action',"<?php //echo base_url() . 'profile/blogs/image/' . $blogId                                  ?>"  );
         $('#title').text(name);
         if (desc == "") {
             desc = 'No Description';
@@ -312,7 +332,7 @@
 //            url: '<?php echo base_url("blog-clicked") ?>',
 //            cache: false,
 //            type: 'post',
-//            data: {counter: <?php //echo $getBlogDetails->clicked_counter ?>, blog_id: '<?php echo $getBlogDetails->blog_id ?>'},
+//            data: {counter: <?php //echo $getBlogDetails->clicked_counter         ?>, blog_id: '<?php echo $getBlogDetails->blog_id ?>'},
 //            datatype: 'json',
 //            success: function (response) {
 //
@@ -460,4 +480,95 @@
         }
     }
     );
+
+
+
+</script>
+<!--<script src="<?php echo base_url() . 'bower_components/amcharts4/core.js' ?>"></script>
+<script src="<?php echo base_url() . 'bower_components/amcharts4/charts.js' ?>"></script>-->
+<!--<script src="//cdn.amcharts.com/lib/4/core.js"></script>
+<script src="//cdn.amcharts.com/lib/4/maps.js"></script>
+<script src="//cdn.amcharts.com/lib/4/geodata/worldLow.js"></script>
+
+<script>
+var map = am4core.create("mapdiv", am4maps.MapChart);
+map.projection = new am4maps.projections.Miller();
+
+</script>-->
+<script src="https://cdn.amcharts.com/lib/4/core.js"></script>
+<script src="https://cdn.amcharts.com/lib/4/maps.js"></script>
+<script src="https://cdn.amcharts.com/lib/4/geodata/worldLow.js"></script>
+<script src="https://cdn.amcharts.com/lib/4/geodata/usaLow.js"></script>
+
+<!--<script src="https://cdn.amcharts.com/lib/4/charts.js"></script>-->
+
+<?php
+$countryCodes = "";
+foreach ($getCountriesByContinent as $country) {
+    $countryCodes .= "`" . $country->code . "`" . ",";
+}         //print_r("Hello".$countryCodes);die;
+?>
+<script>
+// Create map instance
+    var chart = am4core.create("chartdiv", am4maps.MapChart);
+    //chart.maxZoomLevel = 1;
+
+
+    chart.seriesContainer.draggable = false;
+    chart.seriesContainer.resizable = false;
+// Set map definition
+    chart.geodata = am4geodata_worldLow;
+
+// Set projection
+<?php if ($getBlogDetails->country != "230") { ?>
+        chart.projection = new am4maps.projections.Miller();
+
+    // Create map polygon series
+        var polygonSeries = chart.series.push(new am4maps.MapPolygonSeries());
+
+    // Make map load polygon (like country names) data from GeoJSON
+        polygonSeries.useGeodata = true;
+
+    // Configure series
+        var polygonTemplate = polygonSeries.mapPolygons.template;
+        polygonTemplate.tooltipText = "{name}";
+        polygonTemplate.fill = am4core.color("#74B266");
+
+    // Create hover state and set alternative fill color
+        var hs = polygonTemplate.states.create("hover");
+        hs.properties.fill = am4core.color("#367B25");
+
+
+        polygonSeries.include = [<?php echo $countryCodes ?>];
+        polygonSeries.data = [{
+                "id": "<?php echo $getBlogDetails->country_code; ?>",
+                "name": "<?php echo $getBlogDetails->country_name; ?>",
+                hcenter: "middle",
+                vcenter: "bottom",
+                "fill": am4core.color("#F05C5C")
+            }];
+
+        polygonTemplate.propertyFields.fill = "fill";
+<?php } ?>
+
+<?php if ($getBlogDetails->country == "230") { ?>
+        chart.projection = new am4maps.projections.AlbersUsa();
+
+        var usaSeries = chart.series.push(new am4maps.MapPolygonSeries());
+        usaSeries.geodata = am4geodata_usaLow;
+        var polygonTemplate = usaSeries.mapPolygons.template;
+        polygonTemplate.tooltipText = "{name}";
+        polygonTemplate.fill = am4core.color("#74B266");
+        var hs = polygonTemplate.states.create("hover");
+        hs.properties.fill = am4core.color("#367B25");
+    usaSeries.data = [{
+                "id": "US-<?php echo $getBlogDetails->state_code; ?>",
+                "name": "<?php echo $getBlogDetails->state_name; ?>",
+                hcenter: "middle",
+                vcenter: "bottom",
+                "fill": am4core.color("#F05C5C")
+            }];
+        polygonTemplate.propertyFields.fill = "fill";
+
+<?php } ?>
 </script>

@@ -65,8 +65,11 @@ class profile_model extends CI_Model {
     public function getSummaryData($blogId, $userId) {
         $this->db->where('blog_id', $blogId);
         $this->db->where('user_id', $userId);
-        $this->db->select('*');
+        $this->db->select('blog.*,con.name as continent_name, co.name as country_name,s.* ');
         $this->db->from('blog');
+        $this->db->join('continents con', "con.code = blog.continent", "left");
+        $this->db->join('countries co', "co.country_id = blog.country", "left");
+        $this->db->join('states s', "s.state_id = blog.state", "left");
         $query = $this->db->get();
         //print_r($query->row());die;
         return $query->row();
@@ -75,9 +78,10 @@ class profile_model extends CI_Model {
     public function getAttractionsData($blogId, $userId) {
         $this->db->where('ba.blog_id', $blogId);
         $this->db->where('user_id', $userId);
-        $this->db->select('attr_name,attr_description');
+        $this->db->select('attr_id,attr_name,attr_description');
         $this->db->from('blog_attractions ba');
         $this->db->join('blog b', 'b.blog_id = ba.blog_id');
+        $this->db->join('attractions a', 'a.attractions_id = ba.attr_id',"left");
         $query = $this->db->get();
         //print_r($query->row());die;
         return $query->row();
@@ -134,8 +138,11 @@ class profile_model extends CI_Model {
     public function getProfileData($userId) {
         //   $this->db->where('bp.blog_id', $blogId);
         $this->db->where('id', $userId);
-        $this->db->select('*');
+        $this->db->select('users.*,con.name as continent_name, co.name as country_name,s.*');
         $this->db->from('users');
+        $this->db->join("continents con", "con.code=users.continent_from", "left");
+        $this->db->join("countries co", "co.country_id=users.country_from", "left");
+        $this->db->join("states s", "s.state_id=users.state_from", "left");
         $query = $this->db->get();
         //print_r($query->row());die;
         return $query->row();

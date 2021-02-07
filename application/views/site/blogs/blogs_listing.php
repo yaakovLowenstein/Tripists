@@ -1,70 +1,6 @@
 <div class="fluid-containter">
-    <div class="row top-row">
-        <div class="col-md-10 offset-md-2">       
-            <div class="col-md-9 " style="text-align: center">       
-                <h1 >BLOG POSTS</h1>
-            </div>
-            <form action="<?php echo base_url('blogs') ?>" style="width: 100%" method="get" onsubmit="">
-                <h3 >Search<i class="fas fa-search" style="margin-left: 5px;"></i></h3>
+ <?php require_once(APPPATH . "views/site/blogs/listing_header.php"); ?>
 
-                <div class="row">
-                    <div class="col-md-3" style="display: inline-block;padding-left: ">
-                        <input type="text" placeholder="Title" name="title" class="form-control add_btn"
-                               value="<?php echo $this->input->get('title') ?>" >
-
-                    </div>
-                    <div class="col-md-3"  style="display: inline-block">
-                        <input type="text" placeholder="Dates" name="dates" class="form-control add_btn"
-                               value="<?php echo isset($searchstring['dates']) ? $searchstring['dates'] : '' ?>">
-
-                    </div>
-                    <div class="col-md-3" id="blog-list-users"  style="display: inline-block">
-
-                        <select  data-placeholder="Author" class="users" name="user" id="user"  style="width:100%" data-tags='false'>      
-                            <?php if (isset($searchstring['user']) && !empty($searchstring['user'])) { ?>
-
-                                <option value="<?php echo $searchstring['user'] ?>" selected="selected"><?php echo $searchstring['username']; ?></option>
-                                <?php ?>
-                            <?php } ?>
-
-                        </select>
-                    </div>
-
-                </div>
-                <div class="row">
-                    <div class="col-md-4" style="padding-left: ">
-                        <!--<label for="location" class="top-row">Location Tags*</label>-->
-                        <select data-placeholder="Location Tags" class="location-mulitiple" name="locations[]" id="location" multiple="multiple" style="width:100%" data-tags='false'>      
-                            <?php
-                            if (isset($searchstring['locations']) && !empty($searchstring['locations'])) {
-                                foreach ($searchstring['locations'] as $RowC) {
-                                    ?>
-                                    <option value="<?php echo $RowC->id; ?>" selected="selected"><?php echo $RowC->text; ?></option>
-                                <?php } ?>
-                            <?php } ?>
-
-                        </select>
-
-                    </div>
-                    <div class="col-md-4">
-                        <input name="search" type ="submit" class="btn btn-success add_btn " value="Search" style="margin-top:0">
-                        <input name="view_all" type ="submit" class="btn btn-success add_btn " value="View All" style="margin-top:0">
-                    </div></div>
-                <!--<input hidden="hidden" value="<?php echo $this->input->get('orderBy') ?>" name="orderBy">-->
-                <div class="form-group col-md-2 offset-md-7 ">
-                    <!--<form method="get" action="<?php echo base_url('blogs') ?>" >-->
-                    <select name='orderBy' class="form-control float-lg-right" onchange="this.form.submit()">
-                        <option <?php if ($this->input->get('orderBy') == 'Newest') { ?>  selected="selected"  <?php } ?>>Newest</option>
-                        <option <?php if ($this->input->get('orderBy') == 'Oldest') { ?>  selected="selected"  <?php } ?>>Oldest</option>
-                        <option <?php if ($this->input->get('orderBy') == 'Most Popular') { ?>  selected="selected"  <?php } ?>>Most Popular</option>
-                        <option <?php if ($this->input->get('orderBy') == 'Most Liked') { ?>  selected="selected"  <?php } ?>>Most Liked</option>
-                    </select>
-                    <!--</form>-->
-                </div>
-            </form>
-
-        </div>
-    </div>
 
     <?php for ($i = 0; $i < sizeof($blogs); $i++) { ?>
         <div class="row top-row" >
@@ -74,13 +10,26 @@
                     for ($j = 0; $j < 3; $j++) {
                         if ($i + $j < sizeof($blogs)) {
                             ?>
-                            <div class="col-md-3 " style="text-align: left">
+                            <div class="col-md-3 col-sm-12" style="text-align: left">
                                 <a href="<?php echo base_url('blog-details/') . $blogs[$i + $j]['blog_id'] ?>">    <?php if (!empty($blogs[$i + $j]['cover_pic_path'])) { ?>
-                                        <img class="blog-cover-image" width="335" height="225" src="<?php echo base_url() . $blogs[$i + $j]['cover_pic_path'] ?>">
-                                    <?php } else echo '<img class="blog-cover-image" width="335" height="225" src="' . base_url('uploads/1/default.jpg') . '">'; //"<p>Image</p> <p>Not</p> <p>Available</p>"    ?>
+                                        <div class="image-con-cover-thumb">  
+                                            <img class="blog-cover-image img-cover-thumb" src="<?php echo base_url() . $blogs[$i + $j]['cover_pic_path'] ?>">
+                                        </div>
+                                    <?php } else { ?> 
+                                        <div class="image-con-cover-thumb"> 
+                                            <img class="blog-cover-image img-cover-thumb"  src="<?php echo base_url('uploads/1/default.jpg')?>">   
+                                        </div>
+                                    <?php } ?>
                                     <h3><?php echo $blogs[$i + $j]['blog_title'] ?></h3></a>  
-                                <h5><?php echo $blogs[$i + $j]['username'] ?></h5>
-                                <p><?php echo $blogs[$i + $j]['blog_dates'] ?></p>
+                                <h5><strong>Destination: </strong><?php
+                                    if ($blogs[$i + $j]['country'] == '230') {
+                                        echo $blogs[$i + $j]['state_name'] . ", USA";
+                                    } else {
+                                        echo $blogs[$i + $j]['country_name'] . ", " . $blogs[$i + $j]['continent_name'];
+                                    }
+                                    ?></h5>
+                                <h5><strong>By: </strong><?php echo $blogs[$i + $j]['username'] ?></h5>
+                                <p><strong>Dates:</strong> <?php echo $blogs[$i + $j]['blog_dates'] ?></p>
                             </div>
                             <?php
                         }
@@ -105,3 +54,18 @@
 
 </div>
 
+<script>
+<?php
+$refer = $this->agent->referrer();
+if ($refer == base_url() . "destinations/list" || $refer == base_url() . "destinations/map") {
+    ?>
+
+        $(document).ready(function () {
+            $('#tooltip').tooltip("show");
+            setTimeout(function () {
+                $('#tooltip').tooltip('hide');
+            }, 3000);
+
+        });
+<?php } ?>
+</script>

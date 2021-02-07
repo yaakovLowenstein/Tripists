@@ -86,30 +86,7 @@
 
 
     <script>
-        tinymce.init({
-            selector: '#mytextarea',
-            menubar: 'format insert',
-            height: 750,
-            toolbar: 'insertfile undo redo | styleselect | bold italic underline| alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media fullpage | forecolor backcolor emoticons| numlist',
-            force_br_newlines: true,
-            plugins: 'image paste',
-            image_title: true,
-            paste_data_images: true,
-            document_base_url: "<?php echo base_url(); ?>",
-            relative_urls: false,
-            remove_script_host: false,
-            /* enable automatic uploads of images represented by blob or data URIs*/
-            //  automatic_uploads: true,
-//            images_reuse_filename :true,    
-            /*
-             URL of our upload handler (for more details check: https://www.tiny.cloud/docs/configure/file-image-upload/#images_upload_url)
-             images_upload_url: 'postAcceptor.php',
-             here we add custom filepicker only to Image dialog
-             */
-            images_upload_url: ' <?php echo base_url("editorImage/") . $this->uri->segment(5) ?>',
-//           file_picker_types: 'image',
-            /* and here's our custom image picker*/
-            file_picker_callback: function (cb, value, meta) {
+       function filePickerCallback  (cb, value, meta) {
                 var input = document.createElement('input');
                 input.setAttribute('type', 'file');
                 input.setAttribute('accept', 'image/*');
@@ -141,7 +118,39 @@
                     reader.readAsDataURL(file);
                 };
                 input.click();
-            },
+            }
+        
+        
+        tinymce.init({
+            selector: '#mytextarea',
+            menubar: 'format insert',
+            height: 750,
+            toolbar: 'insertfile undo redo | styleselect | bold italic underline| alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media fullpage | forecolor backcolor emoticons| numlist',
+            force_br_newlines: true,
+           plugins: [
+                " autolink  link image  preview  anchor ",
+                " wordcount",
+                
+                "emoticons  paste   "
+            ],
+            
+            image_title: true,
+            paste_data_images: true,
+            document_base_url: "<?php echo base_url(); ?>",
+            relative_urls: false,
+            remove_script_host: false,
+            /* enable automatic uploads of images represented by blob or data URIs*/
+            //  automatic_uploads: true,
+//            images_reuse_filename :true,    
+            /*
+             URL of our upload handler (for more details check: https://www.tiny.cloud/docs/configure/file-image-upload/#images_upload_url)
+             images_upload_url: 'postAcceptor.php',
+             here we add custom filepicker only to Image dialog
+             */
+            images_upload_url: ' <?php echo base_url("editorImage/") . $this->uri->segment(5) ?>',
+//           file_picker_types: 'image',
+            /* and here's our custom image picker*/
+            file_picker_callback:filePickerCallback,
             content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
 //editor.uploadImages(),
             setup: function (editor) {
@@ -151,18 +160,16 @@
                     // tinymce.uploadImages();
 
                 });
-                editor.on('submit', function () {
-                    // return false;
-                });
+                
 <?php
 //this checks to see if we are in edit mode $getSummaryData is set in the profile controller - 
 //if it is set it means we are in edit mode so sets value 
-if (isset($getSummaryData) && !empty($getSummaryData)) {
+if (isset($getSummaryData->blog_summary) && !empty($getSummaryData->blog_summary)) {
     ?>
                     editor.on('init', function (e) {
                         editor.setContent('<?php echo preg_replace('/\r\n?\r?\n/', '<br>', $getSummaryData->blog_summary) ?>');
                     });
-<?php } else if ($this->uri->segment(4) == 'summary') {
+<?php }  if ($this->uri->segment(4) == 'summary' && $this->input->post('summary', true)) {
     ?>
                     editor.on('init', function (e) {
                         editor.setContent('<?php echo preg_replace('/\r\n?\r?\n/', '<br>', $this->input->post('summary', true)) ?>');
@@ -176,7 +183,7 @@ if (isset($getBestDayData) && !empty($getBestDayData)) {
                     editor.on('init', function (e) {
                         editor.setContent('<?php echo preg_replace('/\r\n?\r?\n/', '<br>', $getBestDayData->best_day) ?>');
                     });
-<?php } else if ($this->uri->segment(4) == 'best_day') {
+<?php }  if ($this->uri->segment(4) == 'best_day' && $this->input->post('best_day', true)) {
     ?>
                     editor.on('init', function (e) {
                         editor.setContent('<?php echo preg_replace('/\r\n?\r?\n/', '<br>', $this->input->post('best_day', true)) ?>');
@@ -187,6 +194,7 @@ if (isset($getBestDayData) && !empty($getBestDayData)) {
     </script>
     <script>
         $(document).ready(function () {
+
             $("#blog-post img").each(function (index, element) {
                 var width = element.clientWidth;
                 var height = element.clientHeight;
@@ -209,7 +217,6 @@ if (isset($getBestDayData) && !empty($getBestDayData)) {
                     $(element).addClass("img");
                 }
             });
-
             $('.cities-mulitiple').select2({
                 tags: true,
                 ajax: {
@@ -291,20 +298,31 @@ if (!empty($getAdviceData)) {
     </script>
 
     <script>
-        $(document).ready(function () {
-            $('.location-mulitiple').select2({
-                tags: true,
+        function initializeCountrySelect2() {
+
+            $('.country').select2({
+                language: {
+                    noResults: function () {
+                        return ("Need to select a continent first");
+                    }
+                },
+                allowClear: true,
                 ajax: {
-                    url: "<?php echo base_url('location_tags') ?>",
+                    url: "<?php echo base_url('countries') ?>",
                     dataType: 'json',
-                    type: "Get",
+                    type: "post",
                     quietMillis: 50,
                     data: function (params) {
 
                         var queryParameters = {
-                            q: params.term
+                            q: params.term,
+                            continent: $('.continent').val()
                         }
                         return queryParameters;
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.log(JSON.stringify(jqXHR));
+                        console.log("AJAX error: " + textStatus + ' : ' + errorThrown);
                     },
                     processResults: function (data) {
                         return {
@@ -316,9 +334,101 @@ if (!empty($getAdviceData)) {
 
                 }
             });
-        });
+        }
+        function inititializeLocationsSelect2() {
+            $('.location-mulitiple').select2({
+                tags: true,
+                ajax: {
+                    url: "<?php echo base_url('location_tags') ?>",
+                    dataType: 'json',
+                    type: "Post",
+                    quietMillis: 50,
+                    data: function (params) {
+
+                        var queryParameters = {
+                            q: params.term,
+                            country: $('#country').val()
+                        }
+                        return queryParameters;
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.log(JSON.stringify(jqXHR));
+                        console.log("AJAX error: " + textStatus + ' : ' + errorThrown);
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: $.map(data, function (obj) {
+                                return {id: obj.id, text: obj.text};
+                            })
+                        };
+                    }
+
+                }
+            });
+        }
+        function inititializeStatesSelect2() {
+            $('.state').select2({
+                allowClear: true,
+                ajax: {
+                    url: "<?php echo base_url('states') ?>",
+                    dataType: 'json',
+                    type: "post",
+                    quietMillis: 50,
+                    data: function (params) {
+
+                        var queryParameters = {
+                            q: params.term,
+                        }
+                        return queryParameters;
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.log(JSON.stringify(jqXHR));
+                        console.log("AJAX error: " + textStatus + ' : ' + errorThrown);
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: $.map(data, function (obj) {
+                                return {id: obj.id, text: obj.text};
+                            })
+                        };
+                    }
+
+                }
+            });
+        }
+
+
         $(document).ready(function () {
+            if ($(".continent").val() != null) {
+                initializeCountrySelect2();
+            } else {
+                $('.country').select2({
+                    language: {
+                        noResults: function () {
+                            return ("Need to select a continent first");
+                        }
+                    }
+                });
+            }
+
+            if ($(".country").val() != null) {
+                inititializeLocationsSelect2();
+            } else {
+                $('.location-mulitiple').select2({
+                    language: {
+                        noResults: function () {
+                            return ("Need to select a continent and a country first");
+                        }
+                    }
+                });
+            }
+            if ($(".country").val() == '230') {
+                $("#state-con").show();
+                inititializeStatesSelect2();
+            }
+
             $('.users').select2({
+                allowClear: true,
                 tags: true,
                 ajax: {
                     url: "<?php echo base_url('users-select2') ?>",
@@ -342,6 +452,77 @@ if (!empty($getAdviceData)) {
 
                 }
             });
+            $('.continent').select2({
+                allowClear: true,
+                ajax: {
+                    url: "<?php echo base_url('continents') ?>",
+                    dataType: 'json',
+                    type: "Get",
+                    quietMillis: 50,
+                    data: function (params) {
+
+                        var queryParameters = {
+                            q: params.term
+                        }
+                        return queryParameters;
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: $.map(data, function (obj) {
+                                return {id: obj.id, text: obj.text};
+                            })
+                        };
+                    }
+
+                }
+
+            });
+            $('.attraction').select2({
+                allowClear: true,
+                tags: true,
+                ajax: {
+                    url: "<?php echo base_url('attractions-select') ?>",
+                    dataType: 'json',
+                    type: "Get",
+                    quietMillis: 50,
+                    data: function (params) {
+
+                        var queryParameters = {
+                            q: params.term
+                        }
+                        return queryParameters;
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: $.map(data, function (obj) {
+                                return {id: obj.id, text: obj.text};
+                            })
+                        };
+                    }
+
+                }
+
+            });
+<?php if (($this->uri->segment(1) == "blogs" ) || $this->uri->segment(1) == "bloggers" || $this->uri->segment(4) == "attractions" || $this->uri->segment(1) == "attractions" || $this->uri->segment(1) == "restaurants") { ?>
+                inititializeLocationsSelect2();
+<?php } ?>
+
+        });
+        $('.country').on('change', function () {
+            // alert($('#country').val());
+            inititializeLocationsSelect2();
+            if ($('.country').val() == "230") {
+                $("#state-con").show();
+                inititializeStatesSelect2();
+                //alert("asdf");
+
+            } else {
+                $("#state-con").hide();
+            }
+        });
+        $('.continent').on('change', function () {
+            $('.country').val(null).trigger('change');
+            initializeCountrySelect2();
         });
     </script>
 
@@ -707,7 +888,7 @@ if (isset($isPublished) && $isPublished == 1) {
                 </div>
                 <div class="modal-body" style="text-align: center;">
                     <p id="modal-p" style="color: black;font-size: 24px"></p> 
-                    <input type="button" class="btn btn-success" style="display: none" value="Take me to my blog" id="take-to-blog-btn">
+                    <a href="<?php echo base_url() . "blog-details/" . $this->session->userdata("blogId") ?>"><input type="button" class="btn btn-success" style="display: none" value="Take me to my blog" id="take-to-blog-btn"></a>
                 </div>
                 <div align="center" style="display: none" id="sign-in-form" >
                     <form id='modal-sign-in-form' action="<?php echo base_url() . 'Auth/login?fromPage=yes' ?>" method="post"  style="width: 80%;">
@@ -763,63 +944,55 @@ if (isset($isPublished) && $isPublished == 1) {
             $('[data-toggle="tooltip"]').tooltip()
 
 
-            })
+        })
     </script>
 
     <script>
-<!--============================ PHotos page-===================-->
-function changeDropFileText() {
-// alert('asfd');
-var         numFiles         =         $("input:file")[0].files.length;
-$('#drop-file-text').text(numFiles +         ' image(s) selected');
-
-if         (numFiles ==         0)     {
-$('#drop-file-text').text('Drop files here to upload or click to browse.');
-        }
+        //photos page
+        function changeDropFileText() {
+            // alert('asfd');
+            var numFiles = $("input:file")[0].files.length;
+            $('#drop-file-text').text(numFiles + ' image(s) selected');
+            if (numFiles == 0) {
+                $('#drop-file-text').text('Drop files here to upload or click to browse.');
+            }
         }
 <?php if ($this->uri->segment(1) == 'profile') { ?>
-    $('#imageInputModal').on('show.bs.modal', function (event) {
-    //alert("asdf");
-    var image = $(event.relatedTarget) // image that triggered the modal
-    var num = image.data('whatever') // Extract info from data-* attributes
-    var id = image.data('blog-photos-id');
-    var desc = image.data('description');
-    var modal = $(this)
-    var img = document.getElementById("myImg" + num);
-    //        modal.find('.modal-title').text($('#myImg' + num).src);
-    modal.find('.modal-body input[type="text"]').val($('#myImgName' + num).text());
-    //     /document.write(img.src);
-    modal.find('#modal-image').attr("src", img.src);
-    //$('#modal-form').attr('action',"<?php echo base_url() . 'profile/blogs/image/' . $blogId ?>"  );
-    $('#id').val(id);
-    $('#description').val(desc);
-    });
+            $('#imageInputModal').on('show.bs.modal', function (event) {
+                //alert("asdf");
+                var image = $(event.relatedTarget) // image that triggered the modal
+                var num = image.data('whatever') // Extract info from data-* attributes
+                var id = image.data('blog-photos-id');
+                var desc = image.data('description');
+                var modal = $(this)
+                var img = document.getElementById("myImg" + num);
+                //        modal.find('.modal-title').text($('#myImg' + num).src);
+                modal.find('.modal-body input[type="text"]').val($('#myImgName' + num).text());
+                //     /document.write(img.src);
+                modal.find('#modal-image').attr("src", img.src);
+                //$('#modal-form').attr('action',"<?php echo base_url() . 'profile/blogs/image/' . $blogId ?>"  );
+                $('#id').val(id);
+                $('#description').val(desc);
+            });
 <?php } ?>
-                    
-function deleteImage(id) {
-var ob = $('#' + id);
-        // alert(ob.data('path'));
-        $.ajax({
-        url: '<?php echo base_url("deleteImages") ?>',
+
+        function deleteImage(id) {
+            var ob = $('#' + id);
+            // alert(ob.data('path'));
+            $.ajax({
+                url: '<?php echo base_url("deleteImages") ?>',
                 cache: false,
                 type: 'post',
                 data: {id: id, path: ob.data('path')},
-        datatype: 'json',
-success: function (respnse) {
-location.reload();
-
-}
-});
-}
+                datatype: 'json',
+                success: function (respnse) {
+                    location.reload();
+                }
+            });
+        }
 
     </script>
 
-        <scri    pt>
-            $(document).ready(function () {        
 
-
-
-            </scrip    t>
-
-            </footer>
-            <!-- Footer -->
+</footer>
+<!-- Footer -->

@@ -15,7 +15,7 @@
 
                 <div class="" style="padding: 10px">
                     <!--<label for="name">Password</label>-->
-                    <input type="password" id="name" name="password" class="form-control" style="margin-bottom: " placeholder="Password" value="<?php echo $this->input->post('password', TRUE); ?>">        
+                    <input type="password" id="password" name="password" class="form-control" style="margin-bottom: " placeholder="Password" value="<?php echo $this->input->post('password', TRUE); ?>">        
                     <span class="error"><?php echo form_error('password') ?></span>
                 </div> 
 <!--                <p>

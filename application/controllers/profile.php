@@ -63,7 +63,11 @@ class profile extends CI_Controller {
                     'twitter' => $this->input->post('twitter'),
                     'youtube' => $this->input->post('youtube'),
                     'instagram' => $this->input->post('instagram'),
-                    'profile_pic_path' => $path
+                    'profile_pic_path' => $path,
+                    'continent_from' => $this->input->post('continent_from'),
+                    'country_from' => $this->input->post('country_from'),
+                    'state_from' => $this->input->post('state_from'),
+                    'city' => $this->input->post('city')
                 );
 
                 $setWhere = array('id' => $this->user->id);
@@ -188,7 +192,7 @@ class profile extends CI_Controller {
 
         if ($this->input->post('submit')) {
 
-            $this->form_validation->set_rules('title', 'Title of trip', 'trim|required');
+            $this->form_validation->set_rules('title', 'Title of Blog', 'trim|required');
 
             if ($this->form_validation->run()) {
 
@@ -223,19 +227,17 @@ class profile extends CI_Controller {
                     'cover_pic_path' => $path
                 );
                 if ($blogId == null) {
-                    $blogId = $this->profile_model->insertIntoTable('blog', $inputData);
+                    $success = $blogId = $this->profile_model->insertIntoTable('blog', $inputData);
                 } else {
-                    $this->profile_model->updateTable('blog', $inputData, $setWhere);
+                    $success = $this->profile_model->updateTable('blog', $inputData, $setWhere);
                 }
             }
-            //    die;
-
-            if (isset($blogId)) {
+            if (isset($success) && $success && $blogId) {
                 $this->session->set_flashdata('mess', 'Insert successfull');
-
-                // redirect('profile/blogs/add/summary/' . $blogId, 'refresh');
-            } else
-                $this->session->set_flashdata('mess', 'Insert not successfull');
+                
+                redirect('profile/blogs/add/summary/' . $blogId, 'refresh');
+            }
+            //    die;
         }
 
         if ($blogId != null) {
@@ -256,34 +258,35 @@ class profile extends CI_Controller {
 
         if ($this->input->post('submit')) {
 //                $this->form_validation->set_rules('title', 'Title of trip', 'trim|required');
-            $this->form_validation->set_rules('cities[]', 'Cities', 'trim');
+            //$this->form_validation->set_rules('cities[]', 'Cities', 'trim');
+            $this->form_validation->set_rules('continent', 'Continent', 'trim|required');
+            $this->form_validation->set_rules('country', 'Country', 'trim|required');
             $this->form_validation->set_rules('locations[]', 'Location Tags', 'trim|required');
             $this->form_validation->set_rules('dates', 'Dates', 'trim|required');
             $this->form_validation->set_rules('summary', 'Summary', 'trim|required');
-
+            if ($this->input->post('country', true) == '230') {
+                $this->form_validation->set_rules('state', 'State', 'trim|required');
+            }
 
             if ($this->form_validation->run()) {
                 $inputData = array(
 //                    'user_id' => $this->user->id,
 //                        'blog_title' => $this->input->post('title', true),
+
+                    'continent' => $this->input->post('continent', true),
+                    'country' => $this->input->post('country', true),
+                    'state' => $this->input->post('state', true),
                     'blog_dates' => $this->input->post('dates', true),
                     'blog_summary' => $this->input->post('summary', true),
                 );
                 $cities = $this->input->post('cities', true);
                 $locations = $this->input->post('locations', true);
 
-                //for add new so id is null
-//                if ($blogId == null) {
-//                    $blogId = $this->profile_model->insertBlog('blog', $inputData);
-//                    $success = $this->insertIntoCitiesAndLocationsAndTheirBlogTables($blogId, $cities, $locations);
-                //*****for updatind data when editing*******
-//                } else
-                if ($blogId != null) {
-                    $success = $this->profile_model->updateTable('blog', $inputData, $setWhere);
-                    $success = $success ? $this->deleteById('blog_cities', $blogId) : $success;
-                    $success = $success ? $this->deleteById('blog_locations', $blogId) : $success;
-                    $success = $success ? $this->processMultiInputs($blogId, $cities, $locations) : $success;
-                }
+                $success = $this->profile_model->updateTable('blog', $inputData, $setWhere);
+                //$success = $success ? $this->deleteById('blog_cities', $blogId) : $success;
+                $success = $success ? $this->deleteById('blog_locations', $blogId) : $success;
+                $success = $success ? $this->processMultiInputs($blogId, $cities, $locations) : $success;
+
 
                 if (isset($success) && $success && $blogId) {
                     $this->session->set_flashdata('mess', 'Insert successfull');
@@ -298,7 +301,7 @@ class profile extends CI_Controller {
         $data['getSummaryData'] = $this->profile_model->getSummaryData($blogId, $this->user->id);
         if (!empty($data['getSummaryData'])) {
             $data['getSummaryDataLocations'] = $this->profile_model->getSummaryDataLocations($blogId);
-            $data['getSummaryDataCities'] = $this->profile_model->getSummaryDataCities($blogId);
+            //$data['getSummaryDataCities'] = $this->profile_model->getSummaryDataCities($blogId);
 //                } else {
 //                    redirect('profile/blogs/add/summary', 'refresh');
 //                }
@@ -323,13 +326,13 @@ class profile extends CI_Controller {
         $setWhere = array('blog_id' => $blogId);
 
         if ($this->input->post('submit')) {
-            $this->form_validation->set_rules('name', 'Name', 'trim|required');
+            $this->form_validation->set_rules('attractions', 'Name', 'trim|required');
             $this->form_validation->set_rules('locations[]', 'Location', 'trim|required');
             $this->form_validation->set_rules('description', 'Description', 'trim|required');
             if ($this->form_validation->run()) {
 
                 $inputData = array(
-                    'attr_name' => $this->input->post('name', true),
+                    'attr_id' => $this->input->post('attractions', true),
                     'attr_description' => $this->input->post('description', true)
                 );
                 $locations = $this->input->post('locations[]', true);
@@ -744,13 +747,15 @@ class profile extends CI_Controller {
             $isPublished = $this->function_model->getPublished($blogId);
             $inputData = array(
                 'publish' => $isPublished == 1 ? 0 : 1,
-                'publish_date'=>date("Y/m/d")
+                'publish_date' => date("Y/m/d")
             );
             // print_r($isPublished);die;s
             $this->profile_model->updateTable('blog', $inputData, $setWhere);
             if ($isPublished == 0) {
                 $this->session->set_userdata('success', 'Congrats! Your blog is now published. Click the button below to see how it looks!.');
-                //   echo $this->session->userdata('success');die;
+                $this->session->set_userdata('blogId', $blogId);
+
+//   echo $this->session->userdata('success');die;
             }
             redirect('profile/blogs/', 'refresh');
         } else {
@@ -764,8 +769,6 @@ class profile extends CI_Controller {
         $citi = $this->function_model->getCities($q);
         echo json_encode($citi);
     }
-
-  
 
     private function deleteById($table, $blogId) {
 
@@ -886,17 +889,16 @@ class profile extends CI_Controller {
         if (!is_dir('uploads/editor/' . $blogId)) {
             mkdir('./uploads/editor/' . $blogId, 0777, TRUE);
         }
-        $imageFolder = "uploads/editor/" . $blogId . '/';
-
-        if (isset($_SERVER['HTTP_ORIGIN'])) {
-            // same-origin requests won't set an origin. If the origin is set, it must be valid.
-            if (in_array($_SERVER['HTTP_ORIGIN'], $accepted_origins)) {
-                header('Access-Control-Allow-Origin: ' . $_SERVER['HTTP_ORIGIN']);
-            } else {
-                header("HTTP/1.1 403 Origin Denied");
-                return;
-            }
-        }
+        $imageFolder = "uploads/editor/". $blogId . '/';
+//        if (isset($_SERVER['HTTP_ORIGIN'])) {
+//            // same-origin requests won't set an origin. If the origin is set, it must be valid.
+//            if (in_array($_SERVER['HTTP_ORIGIN'], $accepted_origins)) {
+//                header('Access-Control-Allow-Origin: ' . $_SERVER['HTTP_ORIGIN']);
+//            } else {
+//                header("HTTP/1.1 403 Origin Denied");
+//                return;
+//            }
+//        }
 
         // Don't attempt to process the upload on an OPTIONS request
         if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
@@ -945,7 +947,7 @@ class profile extends CI_Controller {
 
     public function deleteImages() {
         $id = $this->input->post('id');
-        $path = $this->input->post('path'); 
+        $path = $this->input->post('path');
         $this->profile_model->delete("blog_photos", $id);
         unlink($path);
 

@@ -17,8 +17,10 @@ class Blogs extends CI_Controller {
     }
 
     public function blogsListing() {
+        $pageName = $this->uri->segment(1);
+        //  print_r($page);
         if ($this->input->get('view_all')) {
-            redirect('blogs', 'refresh');
+            redirect($pageName, 'refresh');
             //$this->input->get('title') = '';
         }
 
@@ -60,6 +62,30 @@ class Blogs extends CI_Controller {
             }
             $query .= 'user=' . $this->input->get('user');
         }
+        if (($this->input->get('continent') != '')) {
+            $searchstring['continent'] = $this->input->get('continent');
+            $searchstring['continent_name'] = $this->function_model->getContinentById($searchstring['continent']);
+            if ($query != '') {
+                $query .= '&';
+            }
+            $query .= 'continent=' . $this->input->get('continent');
+        }
+        if (($this->input->get('country') != '')) {
+            $searchstring['country'] = $this->input->get('country');
+            $searchstring['country_name'] = $this->function_model->getCountryById($searchstring['country']);
+            if ($query != '') {
+                $query .= '&';
+            }
+            $query .= 'country=' . $this->input->get('country');
+        }
+        if (($this->input->get('state') != '')) {
+            $searchstring['state'] = $this->input->get('state');
+            $searchstring['state_name'] = $this->function_model->getStateById($searchstring['state']);
+            if ($query != '') {
+                $query .= '&';
+            }
+            $query .= 'state=' . $this->input->get('state');
+        }
         //   }   
         if (($this->input->get('locations') != '')) {
             $searchstring['locations'] = $this->input->get('locations');
@@ -79,8 +105,13 @@ class Blogs extends CI_Controller {
         $data['searchstring'] = $searchstring;
 
         $this->load->library('pagination');
-
-        $count = $this->blogs_model->getPublishedBlogCount($searchstring);
+        if ($pageName == 'blogs') {
+            $count = $this->blogs_model->getPublishedBlogCount($searchstring);
+        } else if ($pageName == 'attractions') {
+            $count = $this->blogs_model->getAttractionsCount($searchstring);
+        } else if ($pageName == 'restaurants') {
+            $count = $this->blogs_model->getRestaurantsCount($searchstring);
+        }
 
         $config['total_rows'] = $count;
         $config['per_page'] = 21;
@@ -127,12 +158,10 @@ class Blogs extends CI_Controller {
             } else if ($this->input->get('orderBy') == 'Newest') {
                 $orderBy = 'publish_date';
                 $orderByDirection = 'desc';
-            }
-            else if ($this->input->get('orderBy') == 'Most Popular') {
+            } else if ($this->input->get('orderBy') == 'Most Popular') {
                 $orderBy = 'clicked_count';
                 $orderByDirection = 'desc';
-            }
-             else if ($this->input->get('orderBy') == 'Most Liked') {
+            } else if ($this->input->get('orderBy') == 'Most Liked') {
                 $orderBy = 'TotalLikes';
                 $orderByDirection = 'desc';
             }
@@ -140,10 +169,21 @@ class Blogs extends CI_Controller {
             $orderBy = 'publish_date';
             $orderByDirection = 'desc';
         }
-        $data['blogs'] = $this->blogs_model->getPublishedBlogsForListing($config["per_page"], $page, $searchstring, $orderBy, $orderByDirection);
-
-        $data['main_content'] = 'site/blogs/blogs_listing.php';
-        $this->load->view('lib-site/template', $data);
+        if ($pageName == "blogs") {
+            $data['blogs'] = $this->blogs_model->getPublishedBlogsForListing($config["per_page"], $page, $searchstring, $orderBy, $orderByDirection);
+            $data['main_content'] = 'site/blogs/blogs_listing.php';
+            $this->load->view('lib-site/template', $data);
+        } else if ($pageName == "attractions") {
+            $data['getBlogAttractions'] = $this->blogs_model->getBlogAttractionsList($config["per_page"], $page, $searchstring, $orderBy, $orderByDirection);
+            $data['getAttractionLikes'] = $this->blogs_model->getAttractionLikes();
+            $data['main_content'] = 'site/blogs/attractions.php';
+            $this->load->view('lib-site/template', $data);
+        } else if ($pageName == "restaurants") {
+            $data['getBlogRestaurantsList'] = $this->blogs_model->getBlogRestaurantsList($config["per_page"], $page, $searchstring, $orderBy, $orderByDirection);
+            $data['getRestaurantLikes'] = $this->blogs_model->getRestaurantLikes();
+            $data['main_content'] = 'site/blogs/restaurants.php';
+            $this->load->view('lib-site/template', $data);
+        }
     }
 
     public function blogDetails($id) {
@@ -183,16 +223,18 @@ class Blogs extends CI_Controller {
         $data['totalLikes'] = $allBlogDetails[0]->TotalLikes;
         $data['getAllBLogsByUser'] = $this->blogs_model->getAllBLogsByUser($allBlogDetails[0]->id);
         $data['getLikedBlog'] = $this->blogs_model->getLikedBlog($id);
+        $data['getCountriesByContinent'] = $this->function_model->getCountriesByContinent($allBlogDetails[0]->continent);
 
-        $this->countClicks($id,$allBlogDetails[0]->clicked_count);
-
+        $this->countClicks($id, $allBlogDetails[0]->clicked_count);
 
         $loArray = array();
         foreach ($data['getBlogLocationsDetails'] as $row) {
             array_push($loArray, $row->location_tags_id);
         }
-        $data['getRelatedBlogs'] = $this->blogs_model->getRelatedBlogs($loArray, $id);
-
+        $data['getRelatedBlogs'] = $this->blogs_model->getRelatedBlogs($loArray, $id, "");
+        if ($data['getRelatedBlogs'] < 3) {
+            $data['getRelatedBlogs'] = $this->blogs_model->getRelatedBlogs($loArray, $id, $allBlogDetails[0]->country);
+        }
         $data['main_content'] = 'site/blogs/blog_details.php';
         $this->load->view('lib-site/template', $data);
     }
@@ -211,6 +253,44 @@ class Blogs extends CI_Controller {
             $liked = true;
         } else {
             $this->blogs_model->delete('blog_likes', $blogId, $userId);
+            $liked = FALSE;
+        }
+        echo json_encode($liked);
+    }
+
+    public function attractionLikes() {
+        $like = $this->input->post('like');
+        $attractinoId = $this->input->post('attractions_id');
+        $userId = $this->input->post('userId');
+        $liked = false;
+        if ($like == 1) {
+            $insertData = array(
+                'blog_attractions_id' => $attractinoId,
+                "user_id" => $userId
+            );
+            $this->blogs_model->insert('attraction_likes', $insertData);
+            $liked = true;
+        } else {
+            $this->blogs_model->deleteAttrLike('attraction_likes', $attractinoId, $userId);
+            $liked = FALSE;
+        }
+        echo json_encode($liked);
+    }
+
+    public function restaurantLikes() {
+        $like = $this->input->post('like');
+        $restaurantsId = $this->input->post('restaurant_id');
+        $userId = $this->input->post('userId');
+        $liked = false;
+        if ($like == 1) {
+            $insertData = array(
+                'blog_restaurants_id' => $restaurantsId,
+                "user_id" => $userId
+            );
+            $this->blogs_model->insert('restaurant_likes', $insertData);
+            $liked = true;
+        } else {
+            $this->blogs_model->deleteRestLike('restaurant_likes', $restaurantsId, $userId);
             $liked = FALSE;
         }
         echo json_encode($liked);
@@ -257,7 +337,7 @@ class Blogs extends CI_Controller {
             json_encode(false);
     }
 
-    public function countClicks($blogId,$counter) {
+    public function countClicks($blogId, $counter) {
 //        $counter = $this->input->post('counter');
 //        $blogId = $this->input->post('blog_id');
 
@@ -266,6 +346,14 @@ class Blogs extends CI_Controller {
         );
         $setWhere = array('blog_id' => $blogId);
         $this->blogs_model->updateTable('blog', $insertData, $setWhere);
+    }
+
+    public function attractions() {
+        $data['getBlogAttractions'] = $this->blogs_model->getBlogAttractionsDetails();
+
+
+        $data['main_content'] = 'site/blogs/attractions.php';
+        $this->load->view('lib-site/template', $data);
     }
 
 }

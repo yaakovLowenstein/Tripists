@@ -429,16 +429,14 @@ label{
 .blog-cover-image:hover {
     transform: scale(1.02);
 }
-#blog-list-users .select2-selection__rendered {
-    line-height: 38px !important;
+#blogger-list-users .select2-selection__rendered {
+    line-height: 42px !important;
 }
-#blog-list-users .select2-container .select2-selection--single {
-    height: 38px !important;
-    margin-top: 1.5em;
+#blogger-list-users .select2-container .select2-selection--single {
+    height:42px !important;
 }
-#blog-list-users .select2-selection__arrow {
-    height: 30px !important;
-    margin-top: 1.5em;
+#blogger-list-users .select2-selection__arrow {
+    height: 34px !important;
 
 }
 
@@ -515,6 +513,7 @@ label{
     /*position: absolute;*/
     width: 90%;
     height: 100%;
+    border-radius: 150px;
 }
 
 .image-con-cover{
@@ -541,7 +540,7 @@ label{
     color: blue;
     margin-right: 10%;
     cursor: pointer;
-        
+
 }
 .basic-border{
     border: black 1px solid;
@@ -553,34 +552,34 @@ label{
     transform: scale(1.20);
 }
 .image-modal-content{
-/*    max-height: 80%;
-    max-width: 80%;*/
-     /*max-height: calc(100vh - 200px);*/
+    /*    max-height: 80%;
+        max-width: 80%;*/
+    /*max-height: calc(100vh - 200px);*/
     /*overflow-y: auto;*/
 }
 .image-modal-dialog {
-  width: 100%;
-  height: 100%;
-  margin: 0 auto;
-  padding: 0;
-  max-width: 50%;
-  max-height: 50%;
-  text-align: center
+    width: 100%;
+    height: 100%;
+    margin: 0 auto;
+    padding: 0;
+    max-width: 50%;
+    max-height: 50%;
+    text-align: center
 }
 
 .image-modal-content {
-  height: auto;
-  min-height: 100%;
-  border-radius: 0;
+    height: auto;
+    min-height: 100%;
+    border-radius: 0;
 }
 .center {
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
 }
 .page-break{
-   color:blue;
-   text-align: center;
+    color:blue;
+    text-align: center;
 }
 .page-break i{
     margin:0 1em;
@@ -598,8 +597,8 @@ label{
 .send-message{
     background-color: lightgrey;
     min-height: 21em;
-      padding-top: 20px;
-   padding-left: 20px
+    padding-top: 20px;
+    padding-left: 20px
 }
 /*.send-message h3{
      padding-top: 20px;
@@ -609,11 +608,241 @@ label{
     display: block;
     width: 70%;
     height: 100px;
-        
+
 }
 .blog-issue{
     background-color: #e83434;
     min-height: 6em;
     vertical-align: middle;
     color: white;
+}
+.help-icon{
+    font-size: 14px;
+    vertical-align: top
+}
+.blog-list-co .select2-selection__rendered {
+    line-height: 42px !important;
+}
+.blog-list-co .select2-container .select2-selection--single {
+    height: 42px !important;
+}
+.blog-list-co .select2-selection__arrow {
+    height: 34px !important;
+
+}
+#chartdiv {
+    height: 250px;
+}
+#form-sum{
+    margin-top:25px;
+}
+#chartdiv2 {
+    height: 250px;
+    height: 800px;
+}
+#destination-tabs{
+    text-align: center
+}
+#destination-tabs li{
+    width:150px;
+    border: 1px solid #007bff;
+    font-weight: 700;
+    border-radius: .25rem;
+    margin: 0 3px;
+}
+#destination-tabs li :hover{
+    background-color: #007bff;
+    color: white !important;
+    border-color: #007bff;
+}
+#destination-tabs li :active{
+    border-color: #007bff !important;
+    background-color: #007bff important;
+
+}
+#destination-tabs .nav-link.active{
+    border-color: #007bff !important;
+    background-color: #007bff;
+
+}
+.destination_list_title{
+    margin:10px 0; 
+}
+.destination_link{
+    display: block;
+}
+#tooltip{
+}
+.prof-image-con{
+    position: relative;
+    width: 100%;
+    /*padding-bottom: 100%;*/
+    margin-bottom: 25px;
+    text-align: center;
+    margin-right: auto;
+    margin-left: auto;
+}
+.prof-img{
+    /*position: absolute;*/
+    width: 90%;
+    height: 100%;
+    border-radius: 150px;
+}
+
+#blog-list-users .select2-selection__rendered {
+    line-height: 38px !important;
+
+}
+#blog-list-users .select2-container .select2-selection--single {
+    height:38px !important;
+    margin-top: 1.5em;
+}
+#blog-list-users .select2-selection__arrow {
+    height: 31px !important;
+    margin-top: 1.5em;
+
+}
+#profile .select2-selection__rendered {
+    line-height: 38px !important;
+
+}
+#profile .select2-container .select2-selection--single {
+    height:38px !important;
+}
+#profile .select2-selection__arrow {
+    height: 31px !important;
+
+}
+.location-title{
+    border-top: 1px  dashed lightgrey;
+    padding:0;
+}
+/*.blog-image-carousel{
+    width: 100%;
+    height:100%;
+}
+.blog-image-carousel-con {
+    position: relative;
+    width: 100px;
+    height:250px;
+    width: 300px;
+     padding-bottom: 100%; 
+    margin-bottom: 25px;
+    text-align: center;
+    margin-right: auto;
+    margin-left: auto;
+}*/
+#usa{
+    color:#007bff;
+    cursor: pointer;
+}
+#usa:hover{
+    text-decoration: underline;
+}
+.image-con-cover-thumb{
+    position: relative;
+    width: 100%;
+    /*padding-bottom: 100%;*/
+    margin-bottom: 25px;
+    margin-right: auto;
+    margin-left: auto;
+}
+.img-cover-thumb{
+    width: 90%;
+    height: 100%;
+}
+#attaction_form .select2-selection__rendered {
+    line-height: 38px !important;
+
+}
+#attaction_form .select2-container .select2-selection--single {
+    height:38px !important;
+}
+#attaction_form .select2-selection__arrow {
+    height: 31px !important;
+
+}
+/*
+h3{
+    font-size:3.5vh
+}
+h5{
+    font-size:2.2vh
+}
+p{
+    font-size:1.8vh
+
+}*/
+.flip-card {
+    background-color: transparent;
+    width: 100%;
+    height: 250px;
+    border: 1px solid #f1f1f1;
+    perspective: 1000px; /* Remove this if you don't want the 3D effect */
+    vertical-align: middle;
+
+}
+
+/* This container is needed to position the front and back side */
+.flip-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 1.5s;
+    transform-style: preserve-3d;
+}
+
+/* Do an horizontal flip when you move the mouse over the flip box container */
+.flip-card:hover .flip-card-inner {
+    transform: rotateY(180deg);
+}
+
+/* Position the front and back side */
+.flip-card-front, .flip-card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden; /* Safari */
+    backface-visibility: hidden;
+}
+
+/* Style the front side (fallback if image is missing) */
+.flip-card-front {
+    background-color: #bbb;
+    color: black;
+}
+
+/* Style the back side */
+.flip-card-back {
+    background-color: dodgerblue;
+    color: white;
+    transform: rotateY(180deg);
+    padding: 20px;
+}
+.desc-modal{
+    background-color: dodgerblue;
+    color: white;
+    padding: 20px;
+}
+.attr-desc{
+    color:black;
+    cursor:pointer;
+}
+.attr-desc:hover{
+    text-decoration: underline;   
+}
+#read_more_blog_title{
+    color: white;
+    display: inline;
+}
+.attr-likes{
+    position: absolute;
+    left: 50%;
+    bottom: 0; 
+}
+.attr-likes-p{
+    color: blue;
+    position: relative;
+    left: -50%;
 }

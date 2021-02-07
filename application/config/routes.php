@@ -63,6 +63,10 @@ $route['profile/blogs/add'] = 'profile/blogsAddEdit';
 $route['cities'] = 'profile/getCities';
 $route['location_tags'] = 'Functions/getLocationTags';
 $route['users-select2'] = 'Functions/getUsersForSelect2';
+$route['continents'] = 'Functions/getContinents';
+$route['countries'] = 'Functions/getCountries';
+$route['states'] = 'Functions/getStates';
+$route['attractions-select'] = 'Functions/getAttractions';
 
 $route['unset_blog_id'] = 'profile/unsetBlogId';
 
@@ -104,8 +108,21 @@ $route['deleteImages'] = 'profile/deleteImages';
 
 //*******blogs front end***************
 $route['blogs'] = 'Blogs/blogsListing';
+$route['attractions'] = 'Blogs/blogsListing';
+$route['restaurants'] = 'Blogs/blogsListing';
+
 $route['blog-details/(:num)'] = 'Blogs/blogDetails/$1';
 $route['blog-likes'] = 'Blogs/blogLikes';
+$route['attraction-likes'] = 'Blogs/attractionLikes';
+$route['restaurant-likes'] = 'Blogs/restaurantLikes';
+
 $route['blog-messages'] = 'Blogs/blogMessages';
 $route['abuse'] = 'Blogs/abuse';
 $route['blog-clicked'] = 'Blogs/countClicks';
+
+//**************destinations*******************
+$route['destinations/map'] = 'Destinations/destinationsMap';
+$route['destinations/list'] = 'Destinations/destinationsList';
+
+$route['bloggers/list'] = 'Bloggers/bloggersList';
+$route['bloggers/details/(:num)'] = 'Bloggers/bloggersDetails/$1';

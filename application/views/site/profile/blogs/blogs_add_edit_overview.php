@@ -4,14 +4,16 @@
     <div class="row blog-content " >
         <div class="col-md-6 header">
             <h3 class=""></h3>
-            <?php
-            if ($this->session->flashdata('mess')) {
-                echo $this->session->flashdata('mess');
-            }
-            ?>
+
+            <?php if ($this->session->flashdata('mess')) { ?>
+                <span style="border: 2px solid red; padding:5px;">
+                    <?php
+                    echo $this->session->flashdata('mess');
+                }
+                ?></span>
             <form  id = "form-sum" method="post" class ="blog-content" action="<?php echo base_url('profile/blogs/add/overview/' . $blogId); ?>" enctype="multipart/form-data" >
 
-                <label for="title">Title of your trip*</label>
+                <label for="title">Title of your Blog*</label>
                 <span class="example"><i>&nbsp;&nbsp;&nbsp;e.g. The time I went skiing in the Alps</i></span>
                 <?php
                 if (isset($getSummaryData) && !empty($getSummaryData)) {
@@ -39,16 +41,16 @@
                     </div>
 
                 </div>
-<?php if (!empty($getSummaryData->cover_pic_path)) { ?>
+                <?php if (!empty($getSummaryData->cover_pic_path)) { ?>
                     <div class="row">
-                        <div class="top-row col-md-8">
-                            <img height="300" width="300px" src="<?php echo base_url($getSummaryData->cover_pic_path) ?>">
+                        <div class="top-row col-md-8 image-con-cover-thumb" style="margin: 0">
+                            <img class="img-cover-thumb" src="<?php echo base_url($getSummaryData->cover_pic_path) ?>">
                         </div>
 
 
                     </div>
 
-<?php } ?>
+                <?php } ?>
 
 
                 <input  class="btn btn-primary pull-right submit-btn" type="submit" name="submit" >
