@@ -67,6 +67,7 @@ $route['continents'] = 'Functions/getContinents';
 $route['countries'] = 'Functions/getCountries';
 $route['states'] = 'Functions/getStates';
 $route['attractions-select'] = 'Functions/getAttractions';
+$route['restaurants-select'] = 'Functions/getRestaurants';
 
 $route['unset_blog_id'] = 'profile/unsetBlogId';
 

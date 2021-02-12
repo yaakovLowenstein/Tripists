@@ -86,54 +86,54 @@
 
 
     <script>
-       function filePickerCallback  (cb, value, meta) {
-                var input = document.createElement('input');
-                input.setAttribute('type', 'file');
-                input.setAttribute('accept', 'image/*');
-                /*
-                 //                 Note: In modern browsers input[type="file"] is functional without
-                 //                 even adding it to the DOM, but that might not be the case in some older
-                 //                 or quirky browsers like IE, so you might want to add it to the DOM
-                 //                 just in case, and visually hide it. And do not forget do remove it
-                 //                 once you do not need it anymore.
-                 //                 */
+        function filePickerCallback(cb, value, meta) {
+            var input = document.createElement('input');
+            input.setAttribute('type', 'file');
+            input.setAttribute('accept', 'image/*');
+            /*
+             //                 Note: In modern browsers input[type="file"] is functional without
+             //                 even adding it to the DOM, but that might not be the case in some older
+             //                 or quirky browsers like IE, so you might want to add it to the DOM
+             //                 just in case, and visually hide it. And do not forget do remove it
+             //                 once you do not need it anymore.
+             //                 */
 //
-                input.onchange = function () {
-                    var file = this.files[0];
-                    var reader = new FileReader();
-                    reader.onload = function () {
-                        /*
-                         Note: Now we need to register the blob in TinyMCEs image blob
-                         registry. In the next release this part hopefully won't be
-                         necessary, as we are looking to handle it internally.
-                         */
-                        var id = 'blobid' + (new Date()).getTime();
-                        var blobCache = tinymce.activeEditor.editorUpload.blobCache;
-                        var base64 = reader.result.split(',')[1];
-                        var blobInfo = blobCache.create(id, file, base64);
-                        blobCache.add(blobInfo);
-                        /* call the callback and populate the Title field with the file name */
-                        cb(blobInfo.blobUri(), {title: file.name});
-                    };
-                    reader.readAsDataURL(file);
+            input.onchange = function () {
+                var file = this.files[0];
+                var reader = new FileReader();
+                reader.onload = function () {
+                    /*
+                     Note: Now we need to register the blob in TinyMCEs image blob
+                     registry. In the next release this part hopefully won't be
+                     necessary, as we are looking to handle it internally.
+                     */
+                    var id = 'blobid' + (new Date()).getTime();
+                    var blobCache = tinymce.activeEditor.editorUpload.blobCache;
+                    var base64 = reader.result.split(',')[1];
+                    var blobInfo = blobCache.create(id, file, base64);
+                    blobCache.add(blobInfo);
+                    /* call the callback and populate the Title field with the file name */
+                    cb(blobInfo.blobUri(), {title: file.name});
                 };
-                input.click();
-            }
-        
-        
+                reader.readAsDataURL(file);
+            };
+            input.click();
+        }
+
+
         tinymce.init({
             selector: '#mytextarea',
             menubar: 'format insert',
             height: 750,
             toolbar: 'insertfile undo redo | styleselect | bold italic underline| alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media fullpage | forecolor backcolor emoticons| numlist',
             force_br_newlines: true,
-           plugins: [
+            plugins: [
                 " autolink  link image  preview  anchor ",
                 " wordcount",
-                
+
                 "emoticons  paste   "
             ],
-            
+
             image_title: true,
             paste_data_images: true,
             document_base_url: "<?php echo base_url(); ?>",
@@ -150,7 +150,7 @@
             images_upload_url: ' <?php echo base_url("editorImage/") . $this->uri->segment(5) ?>',
 //           file_picker_types: 'image',
             /* and here's our custom image picker*/
-            file_picker_callback:filePickerCallback,
+            file_picker_callback: filePickerCallback,
             content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
 //editor.uploadImages(),
             setup: function (editor) {
@@ -160,7 +160,7 @@
                     // tinymce.uploadImages();
 
                 });
-                
+
 <?php
 //this checks to see if we are in edit mode $getSummaryData is set in the profile controller - 
 //if it is set it means we are in edit mode so sets value 
@@ -169,7 +169,7 @@ if (isset($getSummaryData->blog_summary) && !empty($getSummaryData->blog_summary
                     editor.on('init', function (e) {
                         editor.setContent('<?php echo preg_replace('/\r\n?\r?\n/', '<br>', $getSummaryData->blog_summary) ?>');
                     });
-<?php }  if ($this->uri->segment(4) == 'summary' && $this->input->post('summary', true)) {
+<?php } if ($this->uri->segment(4) == 'summary' && $this->input->post('summary', true)) {
     ?>
                     editor.on('init', function (e) {
                         editor.setContent('<?php echo preg_replace('/\r\n?\r?\n/', '<br>', $this->input->post('summary', true)) ?>');
@@ -183,7 +183,7 @@ if (isset($getBestDayData) && !empty($getBestDayData)) {
                     editor.on('init', function (e) {
                         editor.setContent('<?php echo preg_replace('/\r\n?\r?\n/', '<br>', $getBestDayData->best_day) ?>');
                     });
-<?php }  if ($this->uri->segment(4) == 'best_day' && $this->input->post('best_day', true)) {
+<?php } if ($this->uri->segment(4) == 'best_day' && $this->input->post('best_day', true)) {
     ?>
                     editor.on('init', function (e) {
                         editor.setContent('<?php echo preg_replace('/\r\n?\r?\n/', '<br>', $this->input->post('best_day', true)) ?>');
@@ -503,7 +503,34 @@ if (!empty($getAdviceData)) {
                 }
 
             });
-<?php if (($this->uri->segment(1) == "blogs" ) || $this->uri->segment(1) == "bloggers" || $this->uri->segment(4) == "attractions" || $this->uri->segment(1) == "attractions" || $this->uri->segment(1) == "restaurants") { ?>
+            $('.restaurants').select2({
+                allowClear: true,
+                tags: true,
+                ajax: {
+                    url: "<?php echo base_url('restaurants-select') ?>",
+                    dataType: 'json',
+                    type: "Get",
+                    quietMillis: 50,
+                    data: function (params) {
+
+                        var queryParameters = {
+                            q: params.term
+                        }
+                        return queryParameters;
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: $.map(data, function (obj) {
+                                return {id: obj.id, text: obj.text};
+                            })
+                        };
+                    }
+
+                }
+
+            });
+
+<?php if (($this->uri->segment(1) == "blogs" ) || $this->uri->segment(1) == "bloggers" || $this->uri->segment(4) == "attractions" || $this->uri->segment(1) == "attractions" || $this->uri->segment(1) == "restaurants" || $this->uri->segment(4) == "restaurants") { ?>
                 inititializeLocationsSelect2();
 <?php } ?>
 
@@ -534,12 +561,18 @@ if (!empty($getAdviceData)) {
             count++;
             //find and initalize elements
             var org = $('.group').last();
-            var orgSelect = org.find('select');
+            // var orgSelect = [];
+            orgSelect = org.find('#name1');
+            orgSelect2 = org.find('#location1');
+
+            //    alert(orgSelect);
             //  alert(orgSelect);
-            orgSelect.select2('destroy');
+           //     orgSelect2.select2('destroy');
             var clone = $('.group').last().clone(true); //.appendTo($('.group-parent'));         
             var input = clone.find('input'); //.attr('id',);
-            var select = clone.find('select'); //.attr('id',);
+            var Restselect = clone.find('.restaurants'); //.attr('id',);
+            var locselect = clone.find('.location-multiple'); //.attr('id',);
+
             var txtarea = clone.find('textarea'); //.attr('id',);
             var p = clone.find('p[class="error-span select2"]');
             //   alert(div);
@@ -547,9 +580,13 @@ if (!empty($getAdviceData)) {
             //set the ids to increment so each clone has unique ids
             p.attr('id', 'select2-error' + count);
             (input).attr('id', 'name' + count);
-            (select).attr('id', 'rest_city' + count);
+            (Restselect).attr('id', 'name' + count);
+            (locselect).attr('id', 'location' + count);
+
             (txtarea).attr('id', 'description' + count);
-            initializeSelect2(orgSelect, select);
+            initializeSelect2(orgSelect, Restselect);
+            initializeSelect3(orgSelect2, locselect);
+
             //append the clone to the page
             clone.appendTo($('.group-parent'));
             $('#remove').show();
@@ -681,7 +718,7 @@ if (!empty($getAdviceData)) {
             orgSelect.select2({
                 tags: true,
                 ajax: {
-                    url: "<?php echo base_url('cities') ?>",
+                    url: "<?php echo base_url('restaurants-select') ?>",
                     dataType: 'json',
                     type: "Get",
                     quietMillis: 50,
@@ -705,7 +742,57 @@ if (!empty($getAdviceData)) {
             select.select2({
                 tags: true,
                 ajax: {
-                    url: "<?php echo base_url('cities') ?>",
+                    url: "<?php echo base_url('restaurants-select') ?>",
+                    dataType: 'json',
+                    type: "Get",
+                    quietMillis: 50,
+                    data: function (params) {
+
+                        var queryParameters = {
+                            q: params.term
+                        }
+                        return queryParameters;
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: $.map(data, function (obj) {
+                                return {id: obj.id, text: obj.text};
+                            })
+                        };
+                    }
+
+                }
+            });
+        }
+        function initializeSelect3(orgSelect, select) {
+            orgSelect.select2({
+                tags: true,
+                ajax: {
+                    url: "<?php echo base_url('location-multiple') ?>",
+                    dataType: 'json',
+                    type: "Get",
+                    quietMillis: 50,
+                    data: function (params) {
+
+                        var queryParameters = {
+                            q: params.term
+                        }
+                        return queryParameters;
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: $.map(data, function (obj) {
+                                return {id: obj.id, text: obj.text};
+                            })
+                        };
+                    }
+
+                }
+            });
+            select.select2({
+                tags: true,
+                ajax: {
+                    url: "<?php echo base_url('location-multiple') ?>",
                     dataType: 'json',
                     type: "Get",
                     quietMillis: 50,

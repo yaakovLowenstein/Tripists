@@ -107,15 +107,18 @@ class Blogs extends CI_Controller {
         $this->load->library('pagination');
         if ($pageName == 'blogs') {
             $count = $this->blogs_model->getPublishedBlogCount($searchstring);
+            $url = 'blogs';
         } else if ($pageName == 'attractions') {
             $count = $this->blogs_model->getAttractionsCount($searchstring);
+            $url = 'attractions';
         } else if ($pageName == 'restaurants') {
             $count = $this->blogs_model->getRestaurantsCount($searchstring);
+            $url = 'restaruarnts';
         }
 
         $config['total_rows'] = $count;
         $config['per_page'] = 21;
-        $url = 'blogs';
+        // $url = 'blogs';
         if (!empty($query)) {
             $url .= '?' . $query;
         }
@@ -175,6 +178,22 @@ class Blogs extends CI_Controller {
             $this->load->view('lib-site/template', $data);
         } else if ($pageName == "attractions") {
             $data['getBlogAttractions'] = $this->blogs_model->getBlogAttractionsList($config["per_page"], $page, $searchstring, $orderBy, $orderByDirection);
+            $blogAttractionsWithDetails = $this->blogs_model->getBlogAttractionsWithDetails();
+            $prevAttrId = 0;
+            //$max = 0;
+            $attractionsDetailsArray = array();
+            foreach ($blogAttractionsWithDetails as $row) {
+                if ($prevAttrId != $row->attr_id) {
+                    $max = 0;
+                }
+                if ($max <= $row->mostlikes) {
+                    $max = $row->mostlikes;
+                    unset($attractionsDetailsArray[$row->attr_id]);
+                    $attractionsDetailsArray += [$row->attr_id => $row];
+                }
+                $prevAttrId = $row->attr_id;
+            }
+            $data['attractionsDetailsArray'] = $attractionsDetailsArray;
             $data['getAttractionLikes'] = $this->blogs_model->getAttractionLikes();
             $data['main_content'] = 'site/blogs/attractions.php';
             $this->load->view('lib-site/template', $data);

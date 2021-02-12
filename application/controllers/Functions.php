@@ -35,9 +35,16 @@ class Functions extends CI_Controller {
         $location = $this->function_model->getUsersForSelect($q);
         echo json_encode($location);
     }
-     function getAttractions() {
+
+    function getAttractions() {
         $q = $this->input->post('q');
         $location = $this->function_model->getAttractions($q);
+        echo json_encode($location);
+    }
+
+    function getRestaurants() {
+        $q = $this->input->post('q');
+        $location = $this->function_model->getRestaurnats($q);
         echo json_encode($location);
     }
 
