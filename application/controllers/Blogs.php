@@ -89,6 +89,7 @@ class Blogs extends CI_Controller {
         //   }   
         if (($this->input->get('locations') != '')) {
             $searchstring['locations'] = $this->input->get('locations');
+            $searchstring['locationIds'] = $searchstring['locations'];
             foreach ($searchstring['locations'] as $id) {
                 $query .= 'locations%5B%5D=' . $id . '&';
             }
@@ -163,6 +164,9 @@ class Blogs extends CI_Controller {
                 $orderByDirection = 'desc';
             } else if ($this->input->get('orderBy') == 'Most Popular') {
                 $orderBy = 'clicked_count';
+                if ($pageName != "blogs") {
+                    $orderBy = 'mostpopular';
+                }
                 $orderByDirection = 'desc';
             } else if ($this->input->get('orderBy') == 'Most Liked') {
                 $orderBy = 'TotalLikes';
@@ -199,6 +203,22 @@ class Blogs extends CI_Controller {
             $this->load->view('lib-site/template', $data);
         } else if ($pageName == "restaurants") {
             $data['getBlogRestaurantsList'] = $this->blogs_model->getBlogRestaurantsList($config["per_page"], $page, $searchstring, $orderBy, $orderByDirection);
+            $blogRestaurantsWithDetails = $this->blogs_model->getBlogRestaurantsWithDetails();
+            $prevRestId = 0;
+            //$max = 0;
+            $restaurantsDetailsArray = array();
+            foreach ($blogRestaurantsWithDetails as $row) {
+                if ($prevRestId != $row->rest_id) {
+                    $max = 0;
+                }
+                if ($max <= $row->mostlikes) {
+                    $max = $row->mostlikes;
+                    unset($restaurantsDetailsArray[$row->rest_id]);
+                    $restaurantsDetailsArray += [$row->rest_id => $row];
+                }
+                $prevRestId = $row->rest_id;
+            }
+            $data['restaurantsDetailsArray'] = $restaurantsDetailsArray;
             $data['getRestaurantLikes'] = $this->blogs_model->getRestaurantLikes();
             $data['main_content'] = 'site/blogs/restaurants.php';
             $this->load->view('lib-site/template', $data);

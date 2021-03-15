@@ -207,7 +207,7 @@ class function_model extends CI_Model {
         return $query->row()->attr_name;
     }
 
-    public function getRestaurnats($q) {
+    public function getRestaurants($q) {
         $this->db->select('restaurants_id as id, rest_name as text');
         $this->db->from('restaurants');
         if (!empty($q)) {
@@ -217,12 +217,18 @@ class function_model extends CI_Model {
         return $query->result();
     }
 
-    public function getRestaurnatsById($id) {
+    public function getRestaurantsById($id) {
         $this->db->select("rest_name");
         $this->db->from('restaurants');
         $this->db->where('restaurants_id', $id);
         $query = $this->db->get();
         return $query->row()->rest_name;
     }
-
+ public function getLocationsById($id) {
+        $this->db->select("location_tags_name");
+        $this->db->from('location_tags');
+        $this->db->where('location_tags_id', $id);
+        $query = $this->db->get();
+        return $query->row()->location_tags_name;
+    }
 }

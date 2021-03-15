@@ -44,7 +44,7 @@ class Functions extends CI_Controller {
 
     function getRestaurants() {
         $q = $this->input->post('q');
-        $location = $this->function_model->getRestaurnats($q);
+        $location = $this->function_model->getRestaurants($q);
         echo json_encode($location);
     }
 

@@ -16,7 +16,7 @@
 
         </div>
     </div>
-    <form  id="rest-form"  method="post" class ="blog-content" action="<?php echo base_url('profile/blogs/add/restaurants/' . $blogId); ?>" onsubmit="return validate(['name', 'description']);">
+    <form  id="rest-form"  method="post" class ="blog-content" action="<?php echo base_url('profile/blogs/add/restaurants/' . $blogId); ?>" onsubmit="return validate(['name', 'description','location']);">
         <div class="group-parent">
             <?php
             $count = 1;
@@ -47,19 +47,22 @@
                         <select class="restaurants" name="rest_name[]" id="name1" style="width: 100%" >       
 
                             <?php
-                            if (isset($getRestaurantData->rest_id) || $this->input->post('rest_name[]')) {
-                                if (isset($getRestaurantData->rest_id)) {
-                                    $restaurant = $getRestaurantData->rest_id;
-                                    $restaurantName = $getRestaurantData->rest_name;
-                                } if ($this->input->post('rest_name[]')) {
-                                    $restaurant = $this->input->post('rest_name[]');
-                                    $restaurantName = $this->function_model->getAttractionsById($restaurant);
-                                }
+                            if (isset($getRestaurantData[0]['rest_id']) || $this->input->post('rest_name[]')) {
+                                if (isset($getRestaurantData[0]['rest_id'])) {
+                                     
+                                    $restaurant = $getRestaurantData[0]['rest_id'];
+                                    $restaurantName = $getRestaurantData[0]['rest_name_name'];
+                                    print_r($restaurantName) ;
+                                } //if ($this->input->post('rest_name[]')) {
+                                 //   $restaurant = $this->input->post('rest_name[]');
+                                  //  $restaurantName = $this->function_model->getRestaurantsById($restaurant);
+                                //}
                                 ?>
                                 <option value="<?php echo $restaurant; ?>" selected="selected"><?php echo $restaurantName; ?></option>
                             <?php } ?>
 
                         </select>
+                        <p class="error-span select2 name" style="display: none" id="name-select2-error1">This field is required</p>
                         <?php echo form_error('rest_name[]'); ?>
                     </div>
 
@@ -69,64 +72,52 @@
                            <!--<input id="location" name="location[]" class="form-control" style="margin-bottom: 25px;">-->
 
                         <select class="location-mulitiple" name="locations[]" id="location1" style="width:100%">       
-
                             <?php
-//whole next block is to keep the input text there even when the form errors
-                            if ($this->input->post('locations')) {
-                                $inputtedLocations = $this->input->post('locations');
-                                $this->load->model('function_model');
-                                $locations = $this->function_model->getLocationTagsId($inputtedLocations);
-                                foreach ($locations as $location) {
-                                    ?>
-                                    <option value="<?php echo $location->id; ?>" selected="selected"><?php echo $location->text; ?></option>  
-                                    <?php
+                            if (isset($getRestaurantData[0]['location_id']) || $this->input->post('location[]')) {
+                                if (isset($getRestaurantData[0]['location_id'])) {
+                                    $location = $getRestaurantData[0]['location_id'];
+                                    $locationName = $getRestaurantData[0]['location_tags_name'];
+                                } if ($this->input->post('location[]')) {
+                                    $restaurant = $this->input->post('location[]');
+                                    $locationName = $this->function_model->getLocationsById($location);
                                 }
-                                foreach ($inputtedLocations as $location) {
-                                    if (!is_numeric($location)) {
-                                        ?>
-                                        <option value="<?php echo $location; ?>" selected="selected"><?php echo $location; ?></option>  
-
-                                        <?php
-                                    }
-                                }
-                            } else if (isset($getRestaurantData->location) && !empty($getRestaurantData->location)) {
                                 ?>
-                                <option value="<?php echo $getRestaurantData->location; ?>" selected="selected"><?php echo $getRestaurantData->location_tags_name; ?></option>
-                                <?php ?>
+                                <option value="<?php echo $location; ?>" selected="selected"><?php echo $locationName; ?></option>
                             <?php } ?>
+
 
                         </select>
                         <?php echo form_error('locations[]'); ?>
+                        <p class="error-span select2 location" style="display: none" id="location-select2-error1">This field is required</p>
 
                     </div>
                 </div>   
 
                 <!--<div class="group" >-->
-                    <!--                <div class="form-row">
-                    
-                                        <div class="col-md-3 top-row ">
-                                            <label for="name">Name of restaurant</label>
-                                            <input id="name1" name="rest_name[]" class="form-control" style="margin-bottom: " value="<?php echo isset($getRestaurantData[0]['name']) ? $getRestaurantData[0]['name'] : '' ?> ">
-                    <?php echo form_error('rest_name[]'); ?>
-                                            <span class="error-span">This field is required</span>
-                                        </div>
-                    
-                    
-                                    </div>-->
-                    <div class="row rest-desc">
-                        <div class="col-md-6 top-row" style="padding-right: 0">
-                            <label for="description">Short description</label>
-                            <textarea style="height:auto;" id="description1" name="rest_description[]" class="form-control "  ><?php echo isset($getRestaurantData[0]['description']) ? $getRestaurantData[0]['description'] : '' ?> </textarea>
-                            <span class="error-span">This field is required</span>
+                <!--                <div class="form-row">
+                
+                                    <div class="col-md-3 top-row ">
+                                        <label for="name">Name of restaurant</label>
+                                        <input id="name1" name="rest_name[]" class="form-control" style="margin-bottom: " value="<?php echo isset($getRestaurantData[0]['name']) ? $getRestaurantData[0]['name'] : '' ?> ">
+                <?php echo form_error('rest_name[]'); ?>
+                                        <span class="error-span">This field is required</span>
+                                    </div>
+                
+                
+                                </div>-->
+                <div class="row rest-desc">
+                    <div class="col-md-6 top-row" style="padding-right: 0">
+                        <label for="description">Short description</label>
+                        <textarea style="height:auto;" id="description1" name="rest_description[]" class="form-control "  ><?php echo isset($getRestaurantData[0]['description']) ? $getRestaurantData[0]['description'] : '' ?> </textarea>
+                        <span class="error-span">This field is required</span>
 
-                            <?php echo form_error('rest_description[]'); ?>
+                        <?php echo form_error('rest_description[]'); ?>
 
-                        </div>
                     </div>
                 </div>
             </div>
-            <?php //} ?>
         </div>
+        <?php //} ?>
         <input  class="btn btn-primary pull-right submit-btn" type="submit" name="submit"  >
 
     </form>

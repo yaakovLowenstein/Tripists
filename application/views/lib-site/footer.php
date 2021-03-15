@@ -249,14 +249,14 @@ if (!empty($getRestaurantData)) {
 
 
     for ($i = 1; $i < $count; $i++) {
-        $name = $getRestaurantData[$i]['name'];
-        // $cityId = $getRestaurantData[$i]['city'];
-        //$cityName = $getRestaurantData[$i]['citi_name'];
+        //   $name = $getRestaurantData[$i]['name'];
+        $restNameId = $getRestaurantData[$i]['rest_id'];
+        $restName = $getRestaurantData[$i]['rest_name_name'];
         $description = $getRestaurantData[$i]['description'];
-
+        $locationId = $getRestaurantData[$i]['location_id'];
+        $locationName = $getRestaurantData[$i]['location_tags_name'];
         echo '
-                  addMoreRest(`' . $name . '`,`' . "" . '`,`' . "" . '`,`' . $description . '`);
-             ';
+                  addMoreRest(`' . "" . '`,`' . $restNameId . '`,`' . $restName . '`,`' . $description . '`,`' . $locationId . '`,`' . $locationName  .'`,true);  ';
     }
 }
 if (!empty($getWorstPartsData)) {
@@ -271,7 +271,7 @@ if (!empty($getWorstPartsData)) {
         $description = $getWorstPartsData[$i]['description'];
 
         echo '
-                  addMoreRest(`' . $name . '`,`' . '' . '`,`' . '' . '`,`' . $description . '`);
+                  addMoreRest(`' . $name . '`,`' . '' . '`,`' . '' . '`,`' . $description . '`,`' . '' . '`,`' . '' . '`);
              ';
     }
 }
@@ -287,7 +287,7 @@ if (!empty($getAdviceData)) {
         $description = $getAdviceData[$i]['description'];
 
         echo '
-                  addMoreRest(`' . $name . '`,`' . '' . '`,`' . '' . '`,`' . $description . '`);
+                  addMoreRest(`' . $name . '`,`' . '' . '`,`' . '' . '`,`' . $description . '`,`' . '' . '`,`' . '' . '`);
              ';
     }
 }
@@ -478,8 +478,9 @@ if (!empty($getAdviceData)) {
 
             });
             $('.attraction').select2({
-                allowClear: true,
+                // allowClear: true,
                 tags: true,
+                //placeholder:"Attraction",
                 ajax: {
                     url: "<?php echo base_url('attractions-select') ?>",
                     dataType: 'json',
@@ -504,7 +505,7 @@ if (!empty($getAdviceData)) {
 
             });
             $('.restaurants').select2({
-                allowClear: true,
+                //   allowClear: true,
                 tags: true,
                 ajax: {
                     url: "<?php echo base_url('restaurants-select') ?>",
@@ -556,36 +557,52 @@ if (!empty($getAdviceData)) {
 
     <script>
         var count = 1;
-        function addMoreRest(name, cityId, cityName, description) {
+        function addMoreRest(name, restNameId, restName, description, locationId, locationName, automated) {
             //document.write(count);   
             count++;
             //find and initalize elements
             var org = $('.group').last();
             // var orgSelect = [];
-            orgSelect = org.find('#name1');
-            orgSelect2 = org.find('#location1');
+            var item = $(".restaurants");
+            orgRestSelect = org.find(item);
+            var item2 = $(".location-mulitiple");
+            orgLocationSelect = org.find(item2);
 
-            //    alert(orgSelect);
+            // alert(orgSelect);
             //  alert(orgSelect);
-           //     orgSelect2.select2('destroy');
-            var clone = $('.group').last().clone(true); //.appendTo($('.group-parent'));         
-            var input = clone.find('input'); //.attr('id',);
-            var Restselect = clone.find('.restaurants'); //.attr('id',);
-            var locselect = clone.find('.location-multiple'); //.attr('id',);
 
+//            if (count != 2 || 1 ==<?php
+if (!empty($getRestaurantData)) {
+    echo 0;
+} else {
+    echo 1;
+}
+?>) {
+       // alert(automated)
+            if (!automated || count!=2) {
+                orgRestSelect.select2('destroy');
+                orgLocationSelect.select2('destroy');
+            }
+            var clone = $('.group').last().clone(true); //.appendTo($('.group-parent'));         
+//find the elements to clone            
+            var input = clone.find('input'); //.attr('id',);
+            var restSelect = clone.find('.restaurants'); //.attr('id',);
+            var locSelect = clone.find('.location-mulitiple'); //.attr('id',);
             var txtarea = clone.find('textarea'); //.attr('id',);
-            var p = clone.find('p[class="error-span select2"]');
+            var nameError = clone.find('p[class="error-span select2 name"]');
+            var locationError = clone.find('p[class="error-span select2 location"]');
+
             //   alert(div);
 
             //set the ids to increment so each clone has unique ids
-            p.attr('id', 'select2-error' + count);
+            nameError.attr('id', 'name-select2-error' + count);
+            locationError.attr('id', 'location-select2-error' + count);
             (input).attr('id', 'name' + count);
-            (Restselect).attr('id', 'name' + count);
-            (locselect).attr('id', 'location' + count);
-
+            (restSelect).attr('id', 'name' + count);
+            (locSelect).attr('id', 'location' + count);
             (txtarea).attr('id', 'description' + count);
-            initializeSelect2(orgSelect, Restselect);
-            initializeSelect3(orgSelect2, locselect);
+            initializeSelect2(orgRestSelect, restSelect);
+            initializeSelect3(orgLocationSelect, locSelect);
 
             //append the clone to the page
             clone.appendTo($('.group-parent'));
@@ -593,21 +610,37 @@ if (!empty($getAdviceData)) {
             $('#btn-col').removeClass('col-md-6');
             $('#btn-col').addClass('col-md-3 text-right');
             $('#remove-btn-col').addClass('text-left');
-            if (name != '') {
+            if (restNameId != '' || name != '') {
                 //      document.write('#name' + count);
                 $('#name' + count).val(name);
                 $('#description' + count).val(description);
-                $('#rest_city' + count).val('2').trigger('change');
-                var studentSelect = $('#rest_city' + count);
+                // $('#rest_city' + count).val('2').trigger('change');
+                var restNameSelect = $('#name' + count);
+                $.ajax({
+                    type: 'post',
+                    url: "<?php echo base_url('restaurants-select') ?>"
+                }).then(function (data) {
+                    // create the option and append to Select2
+                    var option = new Option(restName, restNameId, true, true);
+                    restNameSelect.append(option).trigger('change');
+                    // manually trigger the `select2:select` event
+                    restNameSelect.trigger({
+                        type: 'select2:select',
+                        params: {
+                            data: data
+                        }
+                    });
+                });
+                var locationSelect = $('#location' + count);
                 $.ajax({
                     type: 'post',
                     url: "<?php echo base_url('location_tags') ?>"
                 }).then(function (data) {
                     // create the option and append to Select2
-                    var option = new Option(cityName, cityId, true, true);
-                    studentSelect.append(option).trigger('change');
+                    var option = new Option(locationName, locationId, true, true);
+                    locationSelect.append(option).trigger('change');
                     // manually trigger the `select2:select` event
-                    studentSelect.trigger({
+                    locationSelect.trigger({
                         type: 'select2:select',
                         params: {
                             data: data
@@ -616,9 +649,10 @@ if (!empty($getAdviceData)) {
                 });
             } else {
                 //set clones to empty
-                $('#name' + count).val('');
+                //  $('#name' + count).val('');
                 $('#description' + count).val('');
-                $('#rest_city' + count).val(-1).trigger('change');
+                $('#name' + count).val("").trigger('change');
+                $('#location' + count).val("").trigger('change');
                 $('#name' + count).focus();
             }
         }
@@ -630,7 +664,11 @@ if (!empty($getAdviceData)) {
             addMoreRest('', '', '');
         });
         $("#remove").click(function () {
+            //  $('#description' + count).val('');
+            //    $('#name' + count).select2('destroy');;//val("").trigger('change');
+            //  $('#location' + count).select2('destroy');;//.val("").trigger('change');
             count--;
+
             if ($('.group').length != 1) {
                 $('.group').last().remove()
             }
@@ -647,7 +685,7 @@ if (!empty($getAdviceData)) {
                 for (var j = 0; j < array.length; j++) {
                     if (($('#' + array[j] + i).val() == null)) {
                         validated = false;
-                        $('#select2-error' + i).show();
+                        $('#' + array[j] + '-select2-error' + i).show();
                         // $('#name' + i).focus();
                     } else if (($('#' + array[j] + i).val().trim() == '')) {
                         validated = false;
@@ -768,7 +806,7 @@ if (!empty($getAdviceData)) {
             orgSelect.select2({
                 tags: true,
                 ajax: {
-                    url: "<?php echo base_url('location-multiple') ?>",
+                    url: "<?php echo base_url('location_tags') ?>",
                     dataType: 'json',
                     type: "Get",
                     quietMillis: 50,
@@ -792,7 +830,7 @@ if (!empty($getAdviceData)) {
             select.select2({
                 tags: true,
                 ajax: {
-                    url: "<?php echo base_url('location-multiple') ?>",
+                    url: "<?php echo base_url('location_tags') ?>",
                     dataType: 'json',
                     type: "Get",
                     quietMillis: 50,

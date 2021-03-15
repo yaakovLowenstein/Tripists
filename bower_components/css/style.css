@@ -846,3 +846,21 @@ p{
     position: relative;
     left: -50%;
 }
+.rest-likes{
+    position: absolute;
+    left: 50%;
+    bottom: 0; 
+}
+.rest-likes-p{
+    color: blue;
+    position: relative;
+    left: -50%;
+}
+.rest-desc{
+    color:black;
+    cursor:pointer;
+}
+
+.rest-desc:hover{
+    text-decoration: underline;   
+}

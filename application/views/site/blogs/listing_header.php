@@ -89,11 +89,11 @@
                     <ul class="nav nav-pills" >
                         <li class="nav-item">
                             <a class="nav-link <?php
-                             $params   = $_SERVER['QUERY_STRING'];
+                            $params = $_SERVER['QUERY_STRING'];
                             if ($this->uri->segment(1) == "blogs") {
                                 echo 'active';
                             }
-                            ?>"  href="<?php echo base_url('blogs?').$params ?>" >Blogs</a>
+                            ?>"  href="<?php echo base_url('blogs?') . str_replace('per_page=', "", $params) ?>" >Blogs</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link <?php
@@ -101,16 +101,14 @@
                                 echo 'active';
                             }
                             //$params   = $_SERVER['QUERY_STRING']; //my_id=1,3
-                            
-
-                            ?>" href="<?php echo base_url('attractions?').$params ?>" >Attractions</a>
+                            ?>" href="<?php echo base_url('attractions?') . str_replace('per_page=', "", $params) ?>" >Attractions</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link <?php
                             if ($this->uri->segment(1) == "restaurants") {
                                 echo 'active';
                             }
-                            ?>" href="<?php echo base_url('restaurants?').$params ?>">Restaurants</a>
+                            ?>" href="<?php echo base_url('restaurants?') . str_replace('per_page=', "", $params) ?>">Restaurants</a>
                         </li>
 
                     </ul>
@@ -119,11 +117,13 @@
                     <!--<form method="get" action="<?php echo base_url('blogs') ?>" >-->
                     <span>Sort By</span>
                     <select name='orderBy' class="form-control float-lg-right" onchange="this.form.submit()">
-                        <option <?php if ($this->input->get('orderBy') == 'Newest') { ?>  selected="selected"  <?php } ?>>Newest</option>
-                        <option <?php if ($this->input->get('orderBy') == 'Oldest') { ?>  selected="selected"  <?php } ?>>Oldest</option>
-                        <?php if ($this->uri->segment(1) == "blogs") { ?>
-                            <option <?php if ($this->input->get('orderBy') == 'Most Popular') { ?>  selected="selected"  <?php } ?>>Most Popular</option>
-                        <?php } ?>
+<?php if ($this->uri->segment(1) == "blogs") { ?>
+
+                            <option <?php if ($this->input->get('orderBy') == 'Newest') { ?>  selected="selected"  <?php } ?>>Newest</option>
+                            <option <?php if ($this->input->get('orderBy') == 'Oldest') { ?>  selected="selected"  <?php } ?>>Oldest</option>
+<?php } ?>
+
+                        <option <?php if ($this->input->get('orderBy') == 'Most Popular') { ?>  selected="selected"  <?php } ?>>Most Popular</option>
                         <option <?php if ($this->input->get('orderBy') == 'Most Liked') { ?>  selected="selected"  <?php } ?>>Most Liked</option>
                     </select>
                     <!--</form>-->

@@ -81,7 +81,7 @@ class profile_model extends CI_Model {
         $this->db->select('attr_id,attr_name,attr_description');
         $this->db->from('blog_attractions ba');
         $this->db->join('blog b', 'b.blog_id = ba.blog_id');
-        $this->db->join('attractions a', 'a.attractions_id = ba.attr_id',"left");
+        $this->db->join('attractions a', 'a.attractions_id = ba.attr_id', "left");
         $query = $this->db->get();
         //print_r($query->row());die;
         return $query->row();
@@ -90,10 +90,12 @@ class profile_model extends CI_Model {
     public function getRestaurantData($blogId, $userId) {
         $this->db->where('br.blog_id', $blogId);
         $this->db->where('user_id', $userId);
-        $this->db->select('br.*');
+        $this->db->select('br.*, r.rest_name as rest_name_name,lt.*');
         $this->db->from('blog_restaurants br');
         $this->db->join('blog b', 'b.blog_id = br.blog_id');
-//        $this->db->join('cities c', 'c.citi_id = br.city');
+        $this->db->join('restaurants r', 'r.restaurants_id = br.rest_id', "left");
+        $this->db->join('location_tags lt', 'lt.location_tags_id = br.location_id', "left");
+
         $query = $this->db->get();
         //print_r($query->row());die;
         return $query->result_array();
@@ -252,5 +254,9 @@ class profile_model extends CI_Model {
         $this->db->delete($table);
         return true;
     }
-
+ public function deleteMultipleById($table, $ids,$columnName) {
+        $this->db->where_in($columnName, $ids);
+        $this->db->delete($table);
+        return true;
+    }
 }

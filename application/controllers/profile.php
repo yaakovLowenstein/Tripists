@@ -234,7 +234,7 @@ class profile extends CI_Controller {
             }
             if (isset($success) && $success && $blogId) {
                 $this->session->set_flashdata('mess', 'Insert successfull');
-                
+
                 redirect('profile/blogs/add/summary/' . $blogId, 'refresh');
             }
             //    die;
@@ -330,9 +330,9 @@ class profile extends CI_Controller {
             $this->form_validation->set_rules('locations[]', 'Location', 'trim|required');
             $this->form_validation->set_rules('description', 'Description', 'trim|required');
             if ($this->form_validation->run()) {
-
+                $attrId = $this->determineNewItemsFromSelect2AndInsert('attractions', "attr_name", $this->input->post('attractions', true));
                 $inputData = array(
-                    'attr_id' => $this->input->post('attractions', true),
+                    'attr_id' => $attrId,
                     'attr_description' => $this->input->post('description', true)
                 );
                 $locations = $this->input->post('locations[]', true);
@@ -396,6 +396,7 @@ class profile extends CI_Controller {
             if ($this->form_validation->run()) {
                 $names = $this->input->post('rest_name[]', true);
                 $descriptions = $this->input->post('rest_description[]', true);
+                $locations = $this->input->post('locations[]', true);
 //                $cities = $this->input->post('rest_city[]', true);
 //                $restCities = $this->determineIfNewOrOldCitySingle($cities);
 //to do need to set up this method for cities then finish with the insert(easy part) then need to figure out how to do edit 
@@ -406,9 +407,9 @@ class profile extends CI_Controller {
                     for ($i = 0; $i < sizeof($names); $i++) {
                         $insertData[] = array(
                             //'blog_restaurants_id'=> 23,
-                            'name' => $names[$i],
+                            'rest_id' => $this->determineNewItemsFromSelect2AndInsert("restaurants", "rest_name", $names[$i]),
                             'description' => $descriptions[$i],
-//                            'city' => $restCities[$i],
+                            'location_id' => $this->determineNewItemsFromSelect2AndInsert("location_tags", "location_tags_name", $locations[$i]),
                             'blog_id' => $blogId
                         );
                     }
@@ -418,18 +419,19 @@ class profile extends CI_Controller {
                         if (!empty($data['getRestaurantData'][$i]['blog_restaurants_id'])) {
                             $updateData[] = array(
                                 'blog_restaurants_id' => $data['getRestaurantData'][$i]['blog_restaurants_id'],
-                                'name' => $names[$i],
+                                'rest_id' => $this->determineNewItemsFromSelect2AndInsert("restaurants", "rest_name", $names[$i]),
                                 'description' => $descriptions[$i],
-//                                'city' => $restCities[$i],
+                                'location_id' => $this->determineNewItemsFromSelect2AndInsert("location_tags", "location_tags_name", $locations[$i]),
                                 'blog_id' => $blogId
                             );
                         } else {
                             //print_r("sdfg");die;
                             $insertData[] = array(
                                 //'blog_restaurants_id'=> 23,
-                                'name' => $names[$i],
+                                'rest_id' => $this->determineNewItemsFromSelect2AndInsert("restaurants", "rest_name", $names[$i]),
                                 'description' => $descriptions[$i],
-//                                'city' => $restCities[$i],
+                                'description' => $descriptions[$i],
+                                'location_id' => $this->determineNewItemsFromSelect2AndInsert("location_tags", "location_tags_name", $locations[$i]),
                                 'blog_id' => $blogId
                             );
                         }
@@ -439,7 +441,15 @@ class profile extends CI_Controller {
                         //  print_r("sdfg");die;
                         $success = $this->profile_model->insertBatch('blog_restaurants', $insertData);
                     }
-                }//print_r($success);die;
+                }
+                print_r(sizeof($names) . " " . sizeof($data['getRestaurantData']));
+                if (sizeof($names) < sizeof($data['getRestaurantData'])) {
+                    $deleteArray = array();
+                    for ($i = sizeof($data['getRestaurantData']) - sizeof($names); $i < sizeof($names); $i++) {
+                        array_push($deleteArray, $data['getRestaurantData'][$i]['blog_restaurants_id']);
+                    }
+                    $success = $this->profile_model->deleteMultipleById('blog_restaurants', $deleteArray, 'blog_restaurants_id');
+                }
 
                 if (isset($success) && $success && $blogId) {
 
@@ -843,6 +853,19 @@ class profile extends CI_Controller {
         return $success;
     }
 
+    private function determineNewItemsFromSelect2AndInsert($table, $colName, $selectValue) {
+        if (!is_numeric($selectValue)) {
+            //array_push($oldValueIds, $value);
+            $data = array(
+                $colName => $selectValue
+            );
+            $insertId = $this->profile_model->insertIntoTable($table, $data);
+
+            return $insertId;
+        }
+        return $selectValue;
+    }
+
     private function checkIfBlogExists($blogId) {
         if ($blogId == null) {
             $this->session->set_flashdata('mess', 'Cannot Access until you set a title for your blog');
@@ -889,7 +912,7 @@ class profile extends CI_Controller {
         if (!is_dir('uploads/editor/' . $blogId)) {
             mkdir('./uploads/editor/' . $blogId, 0777, TRUE);
         }
-        $imageFolder = "uploads/editor/". $blogId . '/';
+        $imageFolder = "uploads/editor/" . $blogId . '/';
 //        if (isset($_SERVER['HTTP_ORIGIN'])) {
 //            // same-origin requests won't set an origin. If the origin is set, it must be valid.
 //            if (in_array($_SERVER['HTTP_ORIGIN'], $accepted_origins)) {
@@ -899,7 +922,6 @@ class profile extends CI_Controller {
 //                return;
 //            }
 //        }
-
         // Don't attempt to process the upload on an OPTIONS request
         if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
             header("Access-Control-Allow-Methods: POST, OPTIONS");
