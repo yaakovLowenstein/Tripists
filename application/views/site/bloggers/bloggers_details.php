@@ -1,3 +1,5 @@
+<?php $user = $this->ion_auth->user()->row(); ?>
+
 <div class="fluid-containter">
     <div class="row top-row">
         <div class="offset-1 col-md-2" style="text-align: center">
@@ -21,16 +23,16 @@
             <?php } ?>
 
         </div>
-        <div class="col-md-8">
+        <div class="col-md-6">
             <h3>About <?php echo $bloggerDetails->full_name ?></h3>
             <p><strong>From:</strong> <?php
                 if ($bloggerDetails->state_from == 0) {
                     echo $bloggerDetails->city . ", " . $bloggerDetails->country_name;
                 } else {
-                    echo $bloggerDetails->city . ", ". $bloggerDetails->state_name.", ". $bloggerDetails->country_name;
+                    echo $bloggerDetails->city . ", " . $bloggerDetails->state_name . ", " . $bloggerDetails->country_name;
                 }
                 ?></p>
-                <?php if ($bloggerDetails->website != "https://www." && strpos($bloggerDetails->website, ".")) { ?>
+            <?php if ($bloggerDetails->website != "https://www." && strpos($bloggerDetails->website, ".")) { ?>
                 <span><strong>Website: </strong><a href="<?php echo $bloggerDetails->website ?>" target="blank"><?php echo $bloggerDetails->website ?></a></span>
                 <br>          
                 <br>
@@ -40,7 +42,14 @@
 
             <p><?php echo $bloggerDetails->about ?></p>
         </div>
+        <div class="col-md-2" style="margin: auto auto;text-align: center">
+            <div style="border: 3px #47c4e1 solid;padding: 25px;">
+                <span>Want to get the latest from <strong><?php echo $bloggerDetails->username ?></strong></span>
+                <a href="" class="subscribe"> <h5>Click Here To Subscribe</h5></a>
+                <p>You will receive all of their latest blog posts and more!</p>
 
+            </div>
+        </div>
     </div>
     <div class="row top-row">
         <div class="offset-1 col-md-10 top-row">
@@ -117,6 +126,15 @@
                 }
             }
         })
+        var subscribe = false;
+<?php if (($bloggerDetails->blogger_id) != null) { ?>
+            subscribe = true;
+<?php } ?>
+
+        if (subscribe) {
+            $('.subscribe').text("Unsubscribe");
+            $('.subscribe').wrap('<h5></h5>');
+        }
     });
 
 
@@ -161,4 +179,37 @@
             $('.error-span').show();
         }
     });
+    $(".subscribe").on('click', function (event) {
+        event.preventDefault();
+        if (<?php echo empty($this->ion_auth->user()->row()) ? 0 : 1; ?> == 1) {
+            $.ajax({
+                url: '<?php echo base_url("subscribe") ?>',
+                cache: false,
+                type: 'post',
+                data: {subscribe: <?php echo empty($bloggerDetails->blogger_id) ? 1 : 0 ?>, blogger_id: '<?php echo $bloggerDetails->user_id ?>', userId: <?php echo!empty($user->id) ? $user->id : -1 ?>},
+                datatype: 'json',
+                success: function (response) {
+
+                    location.reload();
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log(JSON.stringify(jqXHR));
+                    console.log("AJAX error: " + textStatus + ' : ' + errorThrown);
+                }
+
+
+            });
+        } else {
+            $('#modal-p').text("You need to login in order to subscribe to this blogger.");
+            $('#modal-header').text('Login');
+            // $('#take-to-blog-btn').show();
+            $('#modal-btn').trigger('click');
+            $('#sign-in-form').show();
+            //$('.modal-footer').hide();
+            $('#modal-a').show();
+            $('.modal-content').height('425px')
+        }
+
+    });
+
 </script>

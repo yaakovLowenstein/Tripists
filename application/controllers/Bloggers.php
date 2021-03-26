@@ -171,4 +171,24 @@ class Bloggers extends CI_Controller {
         $this->load->view('lib-site/template', $data);
     }
 
+    public function subscribe() {
+        $subscribe = $this->input->post('subscribe');
+        $bloggerId = $this->input->post('blogger_id');
+        $userId = $this->input->post('userId');
+        $liked = false;
+        if ($subscribe == 1) {
+            $insertData = array(
+                'blogger_id' => $bloggerId,
+                "user_id" => $userId
+            );
+            $this->load->model('blogs_model');
+            $this->blogs_model->insert('blogger_subscribers', $insertData);
+            $liked = true;
+        } else {
+            $this->bloggers_model->delete('blogger_subscribers', $bloggerId, $userId);
+            $liked = FALSE;
+        }
+        echo json_encode($liked);
+    }
+
 }
