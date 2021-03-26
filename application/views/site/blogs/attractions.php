@@ -1,15 +1,6 @@
 <?php $user = $this->ion_auth->user()->row(); ?>
 
 <?php
-if (isset($_COOKIE['sw'])) {
-    if ($_COOKIE['sw'] > 1350) {
-        $charMax = 250;
-    } else {
-        $charMax = 150;
-    }
-} else {
-    $charMax = 150;
-}
 ?>
 <div class="container-fluid">
     <?php require_once(APPPATH . "views/site/blogs/listing_header.php"); ?>
@@ -28,10 +19,10 @@ if (isset($_COOKIE['sw'])) {
                                 <div class="flip-card-front">
                                     <div style="height: 25%"></div>
                                     <h3><?php echo $attraction->attr_name; ?></h3>
-                                    <!--<h4><?php // echo $attraction->username;      ?></h4>-->
+                                    <!--<h4><?php // echo $attraction->username;        ?></h4>-->
                                     <p><?php echo $attractionsDetailsArray[$attraction->attractions_id]->location_tags_name; ?></p>
-    <!--                                    <p><?php //echo $attraction->attr_id;      ?></p>-->
-                                                                        <!--<p><?php // echo $attraction->blog_attractions_id;      ?></p>-->
+    <!--                                    <p><?php //echo $attraction->attr_id;        ?></p>-->
+                                                                        <!--<p><?php // echo $attraction->blog_attractions_id;        ?></p>-->
 
 
                                     <div class="attr-likes">
@@ -40,12 +31,22 @@ if (isset($_COOKIE['sw'])) {
                                 </div>
                                 <div class="flip-card-back">
                                     <?php
+                                    if (isset($_COOKIE['sw'])) {
+                                        if ($_COOKIE['sw'] > 1350) {
+                                            $charMax = 250;
+                                        } else {
+                                            $charMax = 150;
+                                        }
+                                    } else {
+                                        $charMax = 150;
+                                    }
                                     $descriptionLength = strlen($attractionsDetailsArray[$attraction->attractions_id]->attr_description);
-                                    $max = round($descriptionLength*.67)+15;
-                                    if ($max <$charMax){
+                                    $max = round($descriptionLength * .67) + 15;
+                                    if ($max < $charMax) {
                                         $charMax = $max;
                                     }
-                                    echo character_limiter("<p>Description by: " . $attractionsDetailsArray[$attraction->attractions_id]->username . "</p>" .
+
+                                    echo character_limiter("<p>Summary by: " . $attractionsDetailsArray[$attraction->attractions_id]->username . "</p>" .
                                             $attractionsDetailsArray[$attraction->attractions_id]->attr_description . "<p><a style='color:white' href='" .
                                             base_url("blog-details/") . $attractionsDetailsArray[$attraction->attractions_id]->blog_id . "'>originally seen on: " .
                                             $attractionsDetailsArray[$attraction->attractions_id]->blog_title . "</a></p>", $charMax, '<span> </span><span class="attr-desc"  data-toggle="modal" data-target="#read_more_modal" '
@@ -101,16 +102,16 @@ if (isset($_COOKIE['sw'])) {
         <div class="modal-content desc-modal" style="height:auto !important;display:block;padding:35px;padding-bottom: 50px; " >
             <button type="button" class="close" data-dismiss="modal" style="margin-left: 95%">&times;</button>
             <h4 id="attr_name" style="margin-bottom: 20px;"></h4>
-            <h5 class="d-inline-block" >Description by: </h5> <h5 class="d-inline-block" ><a style="color:white"id="username"></a> </h5>
+            <h5 class="d-inline-block" >Summary by: </h5> <h5 class="d-inline-block" ><a style="color:white"id="username"></a> </h5>
             <p id="modal-likes" style="float:right;"></p>
             </br>           
  <!--<p  id="like_text" class="like" style="float: right;margin: 0;margin-right:  10%;color: ">Like-->
                 <!--<i id="like_icon" class="far fa-thumbs-up like"  style="float: none;margin: 0;"></i></p>-->  
-            <p id="desc"></p>
+            <p id="desc" style="margin-top: 20px;border: 1px white dashed; padding: 10px"></p>
             <a id="read_more_blog_title"></a>
             </br>            </br>
 
-            <a style="display:block;color: white" id="see_more">See all descriptions</a>
+            <h5><a style="display:block;color: white" id="see_more" href="">See all Summaries</a></h5>
             <button type="button" class="btn btn-outline-light" data-dismiss="modal" style="width: 33%;float: right">Close</button>
 
         </div>
@@ -132,22 +133,21 @@ if (isset($_COOKIE['sw'])) {
         var userId = modal.data('user-id');
         var mostLikes = modal.data('mostlikes');
 
+
         $("#desc").text(desc);
         $("#read_more_blog_title").text("Originally seen on: " + title);
         $("#read_more_blog_title").attr("href", "<?php echo base_url("blog-details/") ?>" + id);
-
         $("#attr_name").text(attrName);
         $("#username").text(username);
         $("#username").attr("href", "<?php echo base_url("bloggers/details/") ?>" + userId);
         $("#modal-likes").text("Likes: " + mostLikes);
         $("#see_more").attr("href", "<?php echo base_url("attractions/descriptions/") ?>" + attractionId);
-
+         $("#see_more").text("See All Summaries for "+attrName);
 
     });
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 <script type=text/javascript>
-    var likedAttrArray = [];
 
     function setScreenHWCookie() {
         $.cookie('sw', screen.width);
@@ -156,61 +156,7 @@ if (isset($_COOKIE['sw'])) {
     }
     $(document).ready(function () {
         setScreenHWCookie();
-<?php foreach ($getAttractionLikes as $likedAttr) { ?>
-            var attrId = <?php echo $likedAttr->blog_attractions_id; ?>;
-            $("#like_text" + attrId).text("Unlike");
-            $("#like_text" + attrId).find('i').hide();
-            likedAttrArray[attrId] = attrId;
-<?php } ?>
-    });
 
-    $(".like").on('click', function (event) {
-
-        if (<?php echo empty($this->ion_auth->user()->row()) ? 0 : 1; ?> == 1) {
-            //var attraction = $(event.relatedTarget); // image that triggered the modal
-            //alert(attraction);   
-            //    var id = attraction.dataset.id//('id');
-
-            var id = this.getAttribute("data-id");
-            if (likedAttrArray[id] == id) {
-                var like = 0;
-            } else
-                var like = 1;
-
-            // alert(id);
-            $.ajax({
-                url: '<?php echo base_url("attraction-likes") ?>',
-                cache: false,
-                type: 'post',
-                data: {like: like, attractions_id: id, userId: <?php echo!empty($user->id) ? $user->id : -1 ?>},
-                datatype: 'json',
-                success: function (response) {
-                    if (response) {
-                        $(this).text('Unlike this Blog');
-                        $(this).find('i').hide();
-                        location.reload();
-
-                    } else {
-                        $(this).text('Like this Blog');
-                        this.find('i').show();
-                        location.reload();
-                    }
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    console.log(JSON.stringify(jqXHR));
-                    console.log("AJAX error: " + textStatus + ' : ' + errorThrown);
-                },
-            });
-        } else {
-            $('#modal-p').text("You need to login in order to like this attraction.");
-            $('#modal-header').text('Login');
-            // $('#take-to-blog-btn').show();
-            $('#modal-btn').trigger('click');
-            $('#sign-in-form').show();
-            //$('.modal-footer').hide();
-            $('#modal-a').show();
-            $('.modal-content').height('425px')
-        }
 
     });
 </script>

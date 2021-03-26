@@ -123,7 +123,7 @@
                             <option <?php if ($this->input->get('orderBy') == 'Oldest') { ?>  selected="selected"  <?php } ?>>Oldest</option>
 <?php } ?>
 
-                        <option <?php if ($this->input->get('orderBy') == 'Most Popular') { ?>  selected="selected"  <?php } ?>>Most Popular</option>
+                        <option <?php if ($this->input->get('orderBy') == 'Most Popular'|| empty($this->input->get('orderBy'))) { ?>  selected="selected"  <?php } ?>>Most Popular</option>
                         <option <?php if ($this->input->get('orderBy') == 'Most Liked') { ?>  selected="selected"  <?php } ?>>Most Liked</option>
                     </select>
                     <!--</form>-->

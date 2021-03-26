@@ -1,16 +1,6 @@
 <?php $user = $this->ion_auth->user()->row(); ?>
 
-<?php
-if (isset($_COOKIE['sw'])) {
-    if ($_COOKIE['sw'] > 1350) {
-        $charMax = 250;
-    } else {
-        $charMax = 150;
-    }
-} else {
-    $charMax = 150;
-}
-?>
+
 <div class="container-fluid">
     <?php require_once(APPPATH . "views/site/blogs/listing_header.php"); ?>
 
@@ -28,10 +18,10 @@ if (isset($_COOKIE['sw'])) {
                                 <div class="flip-card-front">
                                     <div style="height: 25%"></div>
                                     <h3><?php echo $restaurant->rest_name; ?></h3>
-                                    <!--<h4><?php // echo $restaurant->username;      ?></h4>-->
+                                    <!--<h4><?php // echo $restaurant->username;        ?></h4>-->
                                     <p><?php echo $restaurantsDetailsArray[$restaurant->restaurants_id]->location_tags_name; ?></p>
-    <!--                                    <p><?php //echo $restaurant->attr_id;      ?></p>-->
-                                                                        <!--<p><?php // echo $restaurant->blog_restaurants_id;      ?></p>-->
+    <!--                                    <p><?php //echo $restaurant->attr_id;        ?></p>-->
+                                                                        <!--<p><?php // echo $restaurant->blog_restaurants_id;        ?></p>-->
 
 
                                     <div class="rest-likes">
@@ -40,12 +30,21 @@ if (isset($_COOKIE['sw'])) {
                                 </div>
                                 <div class="flip-card-back">
                                     <?php
+                                    if (isset($_COOKIE['sw'])) {
+                                        if ($_COOKIE['sw'] > 1350) {
+                                            $charMax = 250;
+                                        } else {
+                                            $charMax = 150;
+                                        }
+                                    } else {
+                                        $charMax = 150;
+                                    }
                                     $descriptionLength = strlen($restaurantsDetailsArray[$restaurant->restaurants_id]->description);
-                                    $max = round($descriptionLength*.67)+15;
-                                    if ($max <$charMax){
+                                    $max = round($descriptionLength * .67) + 15;
+                                    if ($max < $charMax) {
                                         $charMax = $max;
                                     }
-                                    echo character_limiter("<p>Description by: " . $restaurantsDetailsArray[$restaurant->restaurants_id]->username . "</p>" .
+                                    echo character_limiter("<p>Summary by: " . $restaurantsDetailsArray[$restaurant->restaurants_id]->username . "</p>" .
                                             $restaurantsDetailsArray[$restaurant->restaurants_id]->description . "<p><a style='color:white' href='" .
                                             base_url("blog-details/") . $restaurantsDetailsArray[$restaurant->restaurants_id]->blog_id . "'>originally seen on: " .
                                             $restaurantsDetailsArray[$restaurant->restaurants_id]->blog_title . "</a></p>", $charMax, '<span> </span><span class="rest-desc"  data-toggle="modal" data-target="#read_more_modal" '
@@ -106,11 +105,11 @@ if (isset($_COOKIE['sw'])) {
             </br>           
  <!--<p  id="like_text" class="like" style="float: right;margin: 0;margin-right:  10%;color: ">Like-->
                 <!--<i id="like_icon" class="far fa-thumbs-up like"  style="float: none;margin: 0;"></i></p>-->  
-            <p id="desc"></p>
+            <p id="desc" style="margin-top: 20px;border: 1px white dashed; padding: 10px"></p>
             <a id="read_more_blog_title"></a>
             </br>            </br>
 
-            <a style="display:block;color: white" id="see_more">See all descriptions</a>
+            <h5><a style="display:block;color: white" id="see_more">See all Summaries</a></h5> 
             <button type="button" class="btn btn-outline-light" data-dismiss="modal" style="width: 33%;float: right">Close</button>
 
         </div>
@@ -122,10 +121,10 @@ if (isset($_COOKIE['sw'])) {
 <script>
     $('#read_more_modal').on('show.bs.modal', function (event) {
 
-         var modal = $(event.relatedTarget) // image that triggered the modal
+        var modal = $(event.relatedTarget) // image that triggered the modal
         var desc = modal.data('desc');
         var title = modal.data('title');
-        var attrName = modal.data('rest-name');
+        var restName = modal.data('rest-name');
         var id = modal.data('id');
         var restId = modal.data('rest-id');
         var username = modal.data('username');
@@ -136,11 +135,13 @@ if (isset($_COOKIE['sw'])) {
         $("#read_more_blog_title").text("Originally seen on: " + title);
         $("#read_more_blog_title").attr("href", "<?php echo base_url("blog-details/") ?>" + id);
 
-        $("#rest_name").text(attrName);
+        $("#rest_name").text(restName);
         $("#username").text(username);
         $("#username").attr("href", "<?php echo base_url("bloggers/details/") ?>" + userId);
         $("#modal-likes").text("Likes: " + mostLikes);
-        $("#see_more").attr("href", "<?php echo base_url("attractions/descriptions/") ?>" + restId);
+        $("#see_more").attr("href", "<?php echo base_url("restaurants/descriptions/") ?>" + restId);
+        $("#see_more").text("See All Summaries for " + restName);
+
     });
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
@@ -154,64 +155,7 @@ if (isset($_COOKIE['sw'])) {
     }
     $(document).ready(function () {
         setScreenHWCookie();
-<?php foreach ($getRestaurantLikes as $likedRest) { ?>
-            index++;
-            var restId = <?php echo $likedRest->blog_restaurants_id; ?>;
-            $("#like_text" + restId).text("Unlike");
-            $("#like_text" + restId).find('i').hide();
-            likedRestArray[index] = restId+'';
-            //alert(index);
-<?php } ?>
-    
-  });
 
-    $(".like").on('click', function (event) {
-
-        if (<?php echo empty($this->ion_auth->user()->row()) ? 0 : 1; ?> == 1) {
-            //var attraction = $(event.relatedTarget); // image that triggered the modal
-            //alert(attraction);   
-            //    var id = attraction.dataset.id//('id');
-
-            var id = this.getAttribute("data-id");
-            if (likedRestArray.includes(id)) {
-                var like = 0;
-            } else
-                var like = 1;
-
-            // alert(id);
-            $.ajax({
-                url: '<?php echo base_url("restaurant-likes") ?>',
-                cache: false,
-                type: 'post',
-                data: {like: like, restaurant_id: id, userId: <?php echo!empty($user->id) ? $user->id : -1 ?>},
-                datatype: 'json',
-                success: function (response) {
-                    if (response) {
-                        $(this).text('Unlike this Blog');
-                        $(this).find('i').hide();
-                        location.reload();
-
-                    } else {
-                        $(this).text('Like this Blog');
-                        this.find('i').show();
-                        location.reload();
-                    }
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    console.log(JSON.stringify(jqXHR));
-                    console.log("AJAX error: " + textStatus + ' : ' + errorThrown);
-                },
-            });
-        } else {
-            $('#modal-p').text("You need to login in order to like this restaurant.");
-            $('#modal-header').text('Login');
-            // $('#take-to-blog-btn').show();
-            $('#modal-btn').trigger('click');
-            $('#sign-in-form').show();
-            //$('.modal-footer').hide();
-            $('#modal-a').show();
-            $('.modal-content').height('425px')
-        }
 
     });
 </script>

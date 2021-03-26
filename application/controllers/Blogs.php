@@ -166,6 +166,7 @@ class Blogs extends CI_Controller {
                 $orderBy = 'clicked_count';
                 if ($pageName != "blogs") {
                     $orderBy = 'mostpopular';
+                    $orderByDirection = 'desc';
                 }
                 $orderByDirection = 'desc';
             } else if ($this->input->get('orderBy') == 'Most Liked') {
@@ -181,6 +182,10 @@ class Blogs extends CI_Controller {
             $data['main_content'] = 'site/blogs/blogs_listing.php';
             $this->load->view('lib-site/template', $data);
         } else if ($pageName == "attractions") {
+            if ($orderBy == 'publish_date') {
+                $orderBy = 'mostpopular';
+                $orderByDirection = 'desc';
+            }
             $data['getBlogAttractions'] = $this->blogs_model->getBlogAttractionsList($config["per_page"], $page, $searchstring, $orderBy, $orderByDirection);
             $blogAttractionsWithDetails = $this->blogs_model->getBlogAttractionsWithDetails();
             $prevAttrId = 0;
@@ -202,6 +207,10 @@ class Blogs extends CI_Controller {
             $data['main_content'] = 'site/blogs/attractions.php';
             $this->load->view('lib-site/template', $data);
         } else if ($pageName == "restaurants") {
+            if ($orderBy == 'publish_date') {
+                $orderBy = 'mostpopular';
+                $orderByDirection = 'desc';
+            }
             $data['getBlogRestaurantsList'] = $this->blogs_model->getBlogRestaurantsList($config["per_page"], $page, $searchstring, $orderBy, $orderByDirection);
             $blogRestaurantsWithDetails = $this->blogs_model->getBlogRestaurantsWithDetails();
             $prevRestId = 0;
@@ -392,6 +401,22 @@ class Blogs extends CI_Controller {
 
 
         $data['main_content'] = 'site/blogs/attractions.php';
+        $this->load->view('lib-site/template', $data);
+    }
+
+    public function attrDescriptions($attrId) {
+        $data['getAttrDescriptions'] = $this->blogs_model->getAttrDescriptions($attrId);
+        $data['getAttractionLikes'] = $this->blogs_model->getAttractionLikes();
+
+        $data['main_content'] = 'site/blogs/attractions_descriptions.php';
+        $this->load->view('lib-site/template', $data);
+    }
+    
+    public function restDescriptions($restId) {
+        $data['getRestDescriptions'] = $this->blogs_model->getRestDescriptions($restId);
+        $data['getRestaurantLikes'] = $this->blogs_model->getRestaurantLikes();
+
+        $data['main_content'] = 'site/blogs/restaurants_descriptions.php';
         $this->load->view('lib-site/template', $data);
     }
 

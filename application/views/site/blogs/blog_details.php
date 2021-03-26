@@ -1,4 +1,4 @@
-<?php //print_r($getBlogDetails[0]->blog_likes_id);die;                                          ?>
+<?php //print_r($getBlogDetails[0]->blog_likes_id);die;                                                ?>
 
 <?php $user = $this->ion_auth->user()->row(); ?>
 <div class="fluid-containter">
@@ -12,7 +12,7 @@
             <h4 style="display: inline">Written By: <?php echo $getBlogDetails->username ?></h4>
             <p  id="like_text" class="like ">Like this Blog</p>  
             <i id="like_icon" class="far fa-thumbs-up like" style="margin: 0"></i>
-            <div><p style="color:blue;margin-right: -10%"><strong>Likes:</strong> <?php echo $totalLikes?></p>
+            <div><p style="color:blue;margin-right: -10%"><strong>Likes:</strong> <?php echo $totalLikes ?></p>
             </div>
             <?php if (!empty($getBlogDetails->cover_pic_path)) { ?>      
                 <div class="image-con">
@@ -41,9 +41,9 @@
                 <div align="center" class="col-md-10" style="margin: 25px 0;">
                     <h1 ><?php
                         if ($getBlogDetails->country == '230') {
-                            echo $getBlogDetails->state_name.", USA";
+                            echo $getBlogDetails->state_name . ", USA";
                         } else {
-                            echo $getBlogDetails->country_name.", ". $getBlogDetails->continent_name;
+                            echo $getBlogDetails->country_name . ", " . $getBlogDetails->continent_name;
                         }
                         ?> </h1>
                 </div>
@@ -226,7 +226,7 @@
                 </div>
                 <h3>About the Author</h3>
                 <h5><?php echo $getBlogDetails->username ?></h5>
-                <p><?php echo character_limiter($getBlogDetails->about, 100, '<a href="'. base_url().'bloggers/details/'.$getBlogDetails->id.'"> read more...</a>') ?></p>
+                <p><?php echo character_limiter($getBlogDetails->about, 100, '<a href="' . base_url() . 'bloggers/details/' . $getBlogDetails->id . '"> read more...</a>') ?></p>
                 <?php if (sizeof($getAllBLogsByUser) > 1) { ?>
                     <h5>Other Blogs by <?php echo $getBlogDetails->username ?></h5>
                     <ul style="text-align: left">
@@ -237,6 +237,8 @@
 
                     </ul>
                 <?php } ?>
+
+                <!--<a href="#" class="subscribe"><h5>Subscribe</h5></a>-->
             </div>
             <h2 align="center" class="basic-border">Related Blogs</h2>
             <?php for ($i = 0; $i < 3 && $i < sizeof($getRelatedBlogs); $i++) { ?>
@@ -262,7 +264,11 @@
                     </br></h3>
                 <a href="#like_icon"><h1> <i class="fas fa-arrow-up"></i></h1></a>
             </div>
+            <div align="center" class="basic-border top-row subscribe-div" style="padding:25px;">
+                <h5 >Like What you see from<strong> <?php echo $getBlogDetails->username ?></strong>?</h5>
+                <a href="#" class="subscribe color" ><h5>Click here to subscribe and get the latest blogs and more!</h5></a>
 
+            </div>
         </div>
 
     </div>
@@ -315,7 +321,7 @@
         // modal.find('.modal-body #title').val($('#myImgName' + num).text());
         //     /document.write(img.src);
         modal.find('#modal-image').attr("src", img.src);
-        //$('#modal-form').attr('action',"<?php //echo base_url() . 'profile/blogs/image/' . $blogId                                  ?>"  );
+        //$('#modal-form').attr('action',"<?php //echo base_url() . 'profile/blogs/image/' . $blogId                                        ?>"  );
         $('#title').text(name);
         if (desc == "") {
             desc = 'No Description';
@@ -328,16 +334,15 @@
 
     var abuse = false;
     $(document).ready(function () {
-//        $.ajax({
-//            url: '<?php echo base_url("blog-clicked") ?>',
-//            cache: false,
-//            type: 'post',
-//            data: {counter: <?php //echo $getBlogDetails->clicked_counter         ?>, blog_id: '<?php echo $getBlogDetails->blog_id ?>'},
-//            datatype: 'json',
-//            success: function (response) {
-//
-//            }
-//        });
+        var subscribe = false;
+<?php if (($getBlogDetails->blogger_id) != null) { ?>
+            subscribe = true;
+<?php } ?>
+
+        if (subscribe) {
+            $('.subscribe-div').hide();
+            $('.subscribe').wrap('<h5></h5>');
+        }
 
         if (<?php echo empty($getLikedBlog[0]->blog_likes_id) ? 1 : 0 ?> == 0) {
             $('#like_text').text('Unlike this Blog');
@@ -523,18 +528,18 @@ foreach ($getCountriesByContinent as $country) {
 <?php if ($getBlogDetails->country != "230") { ?>
         chart.projection = new am4maps.projections.Miller();
 
-    // Create map polygon series
+        // Create map polygon series
         var polygonSeries = chart.series.push(new am4maps.MapPolygonSeries());
 
-    // Make map load polygon (like country names) data from GeoJSON
+        // Make map load polygon (like country names) data from GeoJSON
         polygonSeries.useGeodata = true;
 
-    // Configure series
+        // Configure series
         var polygonTemplate = polygonSeries.mapPolygons.template;
         polygonTemplate.tooltipText = "{name}";
         polygonTemplate.fill = am4core.color("#74B266");
 
-    // Create hover state and set alternative fill color
+        // Create hover state and set alternative fill color
         var hs = polygonTemplate.states.create("hover");
         hs.properties.fill = am4core.color("#367B25");
 
@@ -561,7 +566,7 @@ foreach ($getCountriesByContinent as $country) {
         polygonTemplate.fill = am4core.color("#74B266");
         var hs = polygonTemplate.states.create("hover");
         hs.properties.fill = am4core.color("#367B25");
-    usaSeries.data = [{
+        usaSeries.data = [{
                 "id": "US-<?php echo $getBlogDetails->state_code; ?>",
                 "name": "<?php echo $getBlogDetails->state_name; ?>",
                 hcenter: "middle",
@@ -571,4 +576,38 @@ foreach ($getCountriesByContinent as $country) {
         polygonTemplate.propertyFields.fill = "fill";
 
 <?php } ?>
+</script>
+<script>
+    $(".subscribe").on('click', function (event) {
+        event.preventDefault();
+        if (<?php echo empty($this->ion_auth->user()->row()) ? 0 : 1; ?> == 1) {
+            $.ajax({
+                url: '<?php echo base_url("subscribe") ?>',
+                cache: false,
+                type: 'post',
+                data: {subscribe: <?php echo empty($getBlogDetails->blogger_id) ? 1 : 0 ?>, blogger_id: '<?php echo $getBlogDetails->user_id ?>', userId: <?php echo!empty($user->id) ? $user->id : -1 ?>},
+                datatype: 'json',
+                success: function (response) {
+
+                    location.reload();
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log(JSON.stringify(jqXHR));
+                    console.log("AJAX error: " + textStatus + ' : ' + errorThrown);
+                }
+
+
+            });
+        } else {
+            $('#modal-p').text("You need to login in order to subscribe to this blogger.");
+            $('#modal-header').text('Login');
+            // $('#take-to-blog-btn').show();
+            $('#modal-btn').trigger('click');
+            $('#sign-in-form').show();
+            //$('.modal-footer').hide();
+            $('#modal-a').show();
+            $('.modal-content').height('425px')
+        }
+
+    });
 </script>
