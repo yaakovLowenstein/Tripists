@@ -256,7 +256,7 @@ if (!empty($getRestaurantData)) {
         $locationId = $getRestaurantData[$i]['location_id'];
         $locationName = $getRestaurantData[$i]['location_tags_name'];
         echo '
-                  addMoreRest(`' . "" . '`,`' . $restNameId . '`,`' . $restName . '`,`' . $description . '`,`' . $locationId . '`,`' . $locationName  .'`,true);  ';
+                  addMoreRest(`' . "" . '`,`' . $restNameId . '`,`' . $restName . '`,`' . $description . '`,`' . $locationId . '`,`' . $locationName . '`,true);  ';
     }
 }
 if (!empty($getWorstPartsData)) {
@@ -338,6 +338,7 @@ if (!empty($getAdviceData)) {
         function inititializeLocationsSelect2() {
             $('.location-mulitiple').select2({
                 tags: true,
+                placeholder: 'Destination Tags',
                 ajax: {
                     url: "<?php echo base_url('location_tags') ?>",
                     dataType: 'json',
@@ -415,6 +416,8 @@ if (!empty($getAdviceData)) {
                 inititializeLocationsSelect2();
             } else {
                 $('.location-mulitiple').select2({
+                    placeholder: 'Destination Tags',
+
                     language: {
                         noResults: function () {
                             return ("Need to select a continent and a country first");
@@ -531,7 +534,7 @@ if (!empty($getAdviceData)) {
 
             });
 
-<?php if (($this->uri->segment(1) == "blogs" ) || $this->uri->segment(1) == "bloggers" || $this->uri->segment(4) == "attractions" || $this->uri->segment(1) == "attractions" || $this->uri->segment(1) == "restaurants" || $this->uri->segment(4) == "restaurants") { ?>
+<?php if (($this->uri->segment(1) == "blogs" ) || $this->uri->segment(1) == "bloggers" || $this->uri->segment(4) == "attractions" || $this->uri->segment(1) == "attractions" || $this->uri->segment(1) == "restaurants" || $this->uri->segment(4) == "restaurants" || $this->uri->segment(2) == "liked") { ?>
                 inititializeLocationsSelect2();
 <?php } ?>
 
@@ -578,8 +581,8 @@ if (!empty($getRestaurantData)) {
     echo 1;
 }
 ?>) {
-       // alert(automated)
-            if (!automated || count!=2) {
+            // alert(automated)
+            if (!automated || count != 2) {
                 orgRestSelect.select2('destroy');
                 orgLocationSelect.select2('destroy');
             }
@@ -607,8 +610,8 @@ if (!empty($getRestaurantData)) {
             //append the clone to the page
             clone.appendTo($('.group-parent'));
             $('#remove').show();
-            $('#btn-col').removeClass('col-md-6');
-            $('#btn-col').addClass('col-md-3 text-right');
+            $('#btn-col').removeClass('col-md-8');
+            $('#btn-col').addClass('col-md-4 text-right');
             $('#remove-btn-col').addClass('text-left');
             if (restNameId != '' || name != '') {
                 //      document.write('#name' + count);
@@ -674,8 +677,8 @@ if (!empty($getRestaurantData)) {
             }
             if ($('.group').length == 1) {
                 $('#remove').hide();
-                $('#btn-col').addClass('col-md-6');
-                $('#btn-col').removeClass('col-md-3 text-right');
+                $('#btn-col').addClass('col-md-8');
+                $('#btn-col').removeClass('col-md-4 text-right');
             }
             $('#name' + count).focus();
         });
@@ -1082,7 +1085,7 @@ if (isset($isPublished) && $isPublished == 1) {
                 $('#drop-file-text').text('Drop files here to upload or click to browse.');
             }
         }
-<?php if ($this->uri->segment(1) == 'profile') { ?>
+<?php if ($this->uri->segment(4) == 'photos') { ?>
             $('#imageInputModal').on('show.bs.modal', function (event) {
                 //alert("asdf");
                 var image = $(event.relatedTarget) // image that triggered the modal
@@ -1117,7 +1120,30 @@ if (isset($isPublished) && $isPublished == 1) {
         }
 
     </script>
+    <?php if (substr($this->uri->segment(2), 0, 5) == "liked" ||$this->uri->segment(2)=='descriptions') { ?>
+        <!-- ***********load more button JS********* -->
+        <script>
+            $(document).ready(function () {
+
+                $(function () {
+                    $(".load").slice(0, 9).addClass('display');
 
 
+                });
+                $("#loadMore").on('click', function (e) {
+                    // e.preventDefault();
+                    $(".load:hidden").slice(0, 9).addClass('display');
+                    if ($(".load:hidden").length == 0) {
+                        $("#loadMore").fadeOut('slow');
+                    }
+                    $('html,body').animate({
+                        scrollTop: $(this).offset().top
+                    }, 1500);
+                });
+            });
+        </script>
+    <?php } ?>
+        
+     
 </footer>
 <!-- Footer -->
