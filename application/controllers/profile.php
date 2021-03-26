@@ -442,10 +442,10 @@ class profile extends CI_Controller {
                         $success = $this->profile_model->insertBatch('blog_restaurants', $insertData);
                     }
                 }
-                print_r(sizeof($names) . " " . sizeof($data['getRestaurantData']));
+                //print_r(sizeof($names) . " " . sizeof($data['getRestaurantData']));
                 if (sizeof($names) < sizeof($data['getRestaurantData'])) {
                     $deleteArray = array();
-                    for ($i = sizeof($data['getRestaurantData']) - sizeof($names); $i < sizeof($names); $i++) {
+                    for ($i = sizeof($names) - 1; $i < sizeof($data['getRestaurantData']) - sizeof($names); $i++) {
                         array_push($deleteArray, $data['getRestaurantData'][$i]['blog_restaurants_id']);
                     }
                     $success = $this->profile_model->deleteMultipleById('blog_restaurants', $deleteArray, 'blog_restaurants_id');
@@ -495,83 +495,83 @@ class profile extends CI_Controller {
         $this->load->view('lib-site/template', $data);
     }
 
-    public function blogsAddEditWorstParts($blogId = null) {
-        $this->checkIfBlogExists($blogId);
-        $data['getWorstPartsData'] = $this->profile_model->getWorstPartsData($blogId, $this->user->id);
-        $this->checkUser($data['getWorstPartsData'], $blogId);
-        $data['isPublished'] = $this->function_model->getPublished($blogId);
-
-
-        $data["blogId"] = $blogId;
-        $setWhere = array('blog_id' => $blogId);
-
-        if ($this->input->post('submit')) {
-            $this->form_validation->set_rules('name[]', 'Name', 'trim|required');
-            $this->form_validation->set_rules('description[]', 'Location', 'trim|required');
-            // $this->form_validation->set_rules('rest_description[]', 'Description', 'trim|required');
-
-
-            if ($this->form_validation->run()) {
-                $names = $this->input->post('name[]', true);
-                $descriptions = $this->input->post('description[]', true);
-                // $cities = $this->input->post('rest_city[]', true);
-                //  $restCities = $this->determineIfNewOrOldCitySingle($cities);
-//to do need to set up this method for cities then finish with the insert(easy part) then need to figure out how to do edit 
-                //  $citiesWithIdAndName = $this->function_model->getCityID($restCities);
-
-                if (empty($data['getWorstPartsData'])) {
-                    //print_r('dfg');die;
-                    for ($i = 0; $i < sizeof($names); $i++) {
-                        $insertData[] = array(
-                            //'blog_restaurants_id'=> 23,
-                            'name' => $names[$i],
-                            'description' => $descriptions[$i],
-                            //  'city' => $restCities[$i],
-                            'blog_id' => $blogId
-                        );
-                    }
-                    $success = $this->profile_model->insertBatch('blog_worst_parts', $insertData);
-                } else if (!empty($data['getWorstPartsData'])) {
-                    for ($i = 0; $i < sizeof($names); $i++) {
-                        if (!empty($data['getWorstPartsData'][$i]['blog_worst_parts_id'])) {
-                            $updateData[] = array(
-                                'blog_worst_parts_id' => $data['getWorstPartsData'][$i]['blog_worst_parts_id'],
-                                'name' => $names[$i],
-                                'description' => $descriptions[$i],
-                                // 'city' => $restCities[$i],
-                                'blog_id' => $blogId
-                            );
-                        } else {
-                            //print_r("sdfg");die;
-                            $insertData[] = array(
-                                //'blog_restaurants_id'=> 23,
-                                'name' => $names[$i],
-                                'description' => $descriptions[$i],
-                                // 'city' => $restCities[$i],
-                                'blog_id' => $blogId
-                            );
-                        }
-                    }
-                    $success = $this->profile_model->updateBatch('blog_worst_parts', $updateData, 'blog_worst_parts_id');
-                    if (!empty($insertData)) {
-                        //  print_r("sdfg");die;
-                        $success = $this->profile_model->insertBatch('blog_worst_parts', $insertData);
-                    }
-                }
-                if (isset($success) && $success && $blogId) {
-
-                    $this->session->set_flashdata('mess', 'Insert successfull');
-
-                    redirect('profile/blogs/add/worst_parts/' . $blogId, 'refresh');
-                } else
-                    $this->session->set_flashdata('mess', 'Insert not successfull');
-            }
-        }
-
-
-        $data['main_content'] = 'site/profile/blogs/blogs_add_edit_worst_parts.php';
-        $this->load->view('lib-site/template', $data);
-    }
+//    public function blogsAddEditWorstParts($blogId = null) {
+//        $this->checkIfBlogExists($blogId);
+//        $data['getWorstPartsData'] = $this->profile_model->getWorstPartsData($blogId, $this->user->id);
+//        $this->checkUser($data['getWorstPartsData'], $blogId);
+//        $data['isPublished'] = $this->function_model->getPublished($blogId);
+//
+//
+//        $data["blogId"] = $blogId;
+//        $setWhere = array('blog_id' => $blogId);
+//
+//        if ($this->input->post('submit')) {
+//            $this->form_validation->set_rules('name[]', 'Name', 'trim|required');
+//            $this->form_validation->set_rules('description[]', 'Location', 'trim|required');
+//            // $this->form_validation->set_rules('rest_description[]', 'Description', 'trim|required');
+//
+//
+//            if ($this->form_validation->run()) {
+//                $names = $this->input->post('name[]', true);
+//                $descriptions = $this->input->post('description[]', true);
+//                // $cities = $this->input->post('rest_city[]', true);
+//                //  $restCities = $this->determineIfNewOrOldCitySingle($cities);
+////to do need to set up this method for cities then finish with the insert(easy part) then need to figure out how to do edit 
+//                //  $citiesWithIdAndName = $this->function_model->getCityID($restCities);
+//
+//                if (empty($data['getWorstPartsData'])) {
+//                    //print_r('dfg');die;
+//                    for ($i = 0; $i < sizeof($names); $i++) {
+//                        $insertData[] = array(
+//                            //'blog_restaurants_id'=> 23,
+//                            'name' => $names[$i],
+//                            'description' => $descriptions[$i],
+//                            //  'city' => $restCities[$i],
+//                            'blog_id' => $blogId
+//                        );
+//                    }
+//                    $success = $this->profile_model->insertBatch('blog_worst_parts', $insertData);
+//                } else if (!empty($data['getWorstPartsData'])) {
+//                    for ($i = 0; $i < sizeof($names); $i++) {
+//                        if (!empty($data['getWorstPartsData'][$i]['blog_worst_parts_id'])) {
+//                            $updateData[] = array(
+//                                'blog_worst_parts_id' => $data['getWorstPartsData'][$i]['blog_worst_parts_id'],
+//                                'name' => $names[$i],
+//                                'description' => $descriptions[$i],
+//                                // 'city' => $restCities[$i],
+//                                'blog_id' => $blogId
+//                            );
+//                        } else {
+//                            //print_r("sdfg");die;
+//                            $insertData[] = array(
+//                                //'blog_restaurants_id'=> 23,
+//                                'name' => $names[$i],
+//                                'description' => $descriptions[$i],
+//                                // 'city' => $restCities[$i],
+//                                'blog_id' => $blogId
+//                            );
+//                        }
+//                    }
+//                    $success = $this->profile_model->updateBatch('blog_worst_parts', $updateData, 'blog_worst_parts_id');
+//                    if (!empty($insertData)) {
+//                        //  print_r("sdfg");die;
+//                        $success = $this->profile_model->insertBatch('blog_worst_parts', $insertData);
+//                    }
+//                }
+//                if (isset($success) && $success && $blogId) {
+//
+//                    $this->session->set_flashdata('mess', 'Insert successfull');
+//
+//                    redirect('profile/blogs/add/worst_parts/' . $blogId, 'refresh');
+//                } else
+//                    $this->session->set_flashdata('mess', 'Insert not successfull');
+//            }
+//        }
+//
+//
+//        $data['main_content'] = 'site/profile/blogs/blogs_add_edit_worst_parts.php';
+//        $this->load->view('lib-site/template', $data);
+//    }
 
     public function blogsAddEditAdivce($blogId = null) {
         $this->checkIfBlogExists($blogId);
@@ -634,6 +634,13 @@ class profile extends CI_Controller {
                     if (!empty($insertData)) {
                         //  print_r("sdfg");die;
                         $success = $this->profile_model->insertBatch('blog_advice', $insertData);
+                    }
+                    if (sizeof($names) < sizeof($data['getAdviceData'])) {
+                        $deleteArray = array();
+                        for ($i = sizeof($names) - 1; $i < sizeof($data['getAdviceData']) - sizeof($names); $i++) {
+                            array_push($deleteArray, $data['getAdviceData'][$i]['blog_advice_id']);
+                        }
+                        $success = $this->profile_model->deleteMultipleById('blog_advice', $deleteArray, 'blog_advice_id');
                     }
                 }
                 if (isset($success) && $success && $blogId) {
@@ -974,6 +981,107 @@ class profile extends CI_Controller {
         unlink($path);
 
         echo json_encode($id);
+    }
+
+    public function likedBlogs() {
+        $page = $this->uri->segment(3);
+        if ($this->input->get('view_all')) {
+            redirect(base_url(uri_string()), 'refresh');
+            //$this->input->get('title') = '';
+        }
+
+        $query = '';
+        $searchstring = array();
+
+
+        if (($this->input->get('title') != '')) {
+            $searchstring['title'] = $this->input->get('title');
+            if ($query != '') {
+                $query .= '&';
+            }
+            $query .= 'title=' . $this->input->get('title');
+        }
+        if (($this->input->get('dates') != '')) {
+            $searchstring['dates'] = $this->input->get('dates');
+            if ($query != '') {
+                $query .= '&';
+            }
+            $query .= 'dates=' . $this->input->get('dates');
+        }
+        //  if (($this->input->get('published') != '--------Select----------') && ($this->input->get('published') != '')) {
+        //    $searchstring['published'] = $this->input->get('published') == 'Published' ? 1 : $this->input->get('published') == 'Not Published' ? '0' : '';
+        if (($this->input->get('user') != '')) {
+            $searchstring['user'] = $this->input->get('user');
+            $searchstring['username'] = $this->function_model->getUserById($searchstring['user']);
+            if ($query != '') {
+                $query .= '&';
+            }
+            $query .= 'user=' . $this->input->get('user');
+        }
+        if (($this->input->get('continent') != '')) {
+            $searchstring['continent'] = $this->input->get('continent');
+            $searchstring['continent_name'] = $this->function_model->getContinentById($searchstring['continent']);
+            if ($query != '') {
+                $query .= '&';
+            }
+            $query .= 'continent=' . $this->input->get('continent');
+        }
+        if (($this->input->get('country') != '')) {
+            $searchstring['country'] = $this->input->get('country');
+            $searchstring['country_name'] = $this->function_model->getCountryById($searchstring['country']);
+            if ($query != '') {
+                $query .= '&';
+            }
+            $query .= 'country=' . $this->input->get('country');
+        }
+        if (($this->input->get('state') != '')) {
+            $searchstring['state'] = $this->input->get('state');
+            $searchstring['state_name'] = $this->function_model->getStateById($searchstring['state']);
+            if ($query != '') {
+                $query .= '&';
+            }
+            $query .= 'state=' . $this->input->get('state');
+        }
+        //   }   
+        if (($this->input->get('locations') != '')) {
+            $searchstring['locations'] = $this->input->get('locations');
+            $searchstring['locationIds'] = $searchstring['locations'];
+            foreach ($searchstring['locations'] as $id) {
+                $query .= 'locations%5B%5D=' . $id . '&';
+            }
+
+            $idsArrays = $this->function_model->locationSearch($searchstring);
+            $blogIds = array();
+            foreach ($idsArrays as $id) {
+                array_push($blogIds, $id->blog_id);
+            }
+
+            $searchstring['blog_ids'] = $blogIds;
+            $searchstring['locations'] = $this->function_model->getLocationTagsId($searchstring['locations']);
+        }
+        $data['searchstring'] = $searchstring;
+
+        if ($page == 'blogs') {
+            $data['blogs'] = $this->profile_model->getLikedBlogsByUser($this->user->id, $searchstring);
+            if ($data['blogs'] > 0) {
+                $data['similarBlogs'] = $this->profile_model->getBlogsSimilarToLikedBlogs($data['blogs'][0]['state'], $data['blogs'][0]['country'], $data['blogs'][0]['user_id']);
+            }
+            $data['main_content'] = 'site/profile/liked/liked_blogs.php';
+        } else if ($page == 'attractions') {
+            $data['blogs'] = $this->profile_model->getLikedAttractionsByUser($this->user->id, $searchstring);
+            if ($data['blogs'] > 0) {
+                $data['similarBlogs'] = $this->profile_model->getBlogsSimilarToLikedBlogs($data['blogs'][0]['state'], $data['blogs'][0]['country'], $data['blogs'][0]['user_id']);
+            }
+            $data['main_content'] = 'site/profile/liked/liked_attractions.php';
+        } else if ($page == 'restaurants') {
+            $data['blogs'] = $this->profile_model->getLikedRestaurantsByUser($this->user->id, $searchstring);
+            if ($data['blogs'] > 0) {
+                $data['similarBlogs'] = $this->profile_model->getBlogsSimilarToLikedBlogs($data['blogs'][0]['state'], $data['blogs'][0]['country'], $data['blogs'][0]['user_id']);
+            }
+            $data['main_content'] = 'site/profile/liked/liked_restaurants.php';
+        }
+
+        $this->load->view('lib-site/template', $data);
     }
 
 }

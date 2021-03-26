@@ -1,8 +1,9 @@
+
+<div class="containter-fluid" style="height: auto;width: 100%">
 <?php require_once(APPPATH . "views/site/profile/blogs/tabs.php"); ?>
 
-<div class="containter-fluid" style="height: auto;">
     <div class="row blog-content " >
-        <div class="col-md-6 header">
+        <div class="col-md-8 header">
             <h3 class=""></h3>
 
         </div>
@@ -48,7 +49,7 @@
                         ?>
                     </div>
                 </div>
-                <div class="row top-row">
+    <div class="row top-row" style="margin-bottom:20px;">
                     <div class="col-md-9">
                         <?php
                         $count = 1;

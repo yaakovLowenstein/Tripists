@@ -1,5 +1,6 @@
-<?php require_once(APPPATH . "views/site/profile/blogs/tabs.php"); ?>
-<div class="containter-fluid" style="height: auto">
+<div class="containter-fluid" style="height: auto;width: 100%">
+    <?php require_once(APPPATH . "views/site/profile/blogs/tabs.php"); ?>
+
     <div class="row " >
         <div class="col-md-8  top-row">
             <!--             <?php
@@ -181,7 +182,7 @@
 </div>
 <script>
     $('#tinymce').on('change', function () {
-alert("sf");
+        alert("sf");
         $('#tinymce img').each(function () {
             $(this).attr("width", "300");
         });

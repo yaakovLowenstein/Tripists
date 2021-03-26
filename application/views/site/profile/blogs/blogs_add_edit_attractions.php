@@ -1,8 +1,9 @@
+
+<div class="containter-fluid" style="height: auto;width: 100%">
 <?php require_once(APPPATH . "views/site/profile/blogs/tabs.php"); ?>
 
-<div class="containter-fluid" style="height: auto;">
     <div class="row blog-content " >
-        <div class="col-md-6 header">
+        <div class="col-md-8 header">
             <h3 class="">Top Attraction!</h3>
             <p>Every trip has those awesome attractions or places you visited that you just want to tell everyone about. Here you can list those
                 attractions that you absolutely loved so that others can share in you experience and go visit these places for themselves.
@@ -24,7 +25,7 @@
                     </div>  -->
     <form  id = "attaction_form" method="post" class ="blog-content" action="<?php echo base_url('profile/blogs/add/attractions/' . $blogId); ?>">
         <div class="form-row">
-            <div class="col-md-3 top-row " style="display: ">
+            <div class="col-md-4 top-row " style="display: ">
                                <label for="attractions" class="">Attraction Name</label>
 
                 <select class="attraction" name="attractions" id="attr" style="width: 100%" >       
@@ -46,7 +47,7 @@
                 <?php echo form_error('attractions'); ?>
             </div>
 
-            <div class="col-md-3 top-row " style="display: ">
+            <div class="col-md-4 top-row " style="display: ">
                 <label for="location" class="">Destination Tag*</label>
                    <!--<span class="example"><i>&nbsp;&nbsp;&nbsp;This can be Country, Region, State, e.g United States, Midwest, Yellowstone National Park, Arizona etc.</i></span>-->
                    <!--<input id="location" name="location[]" class="form-control" style="margin-bottom: 25px;">-->
@@ -85,7 +86,7 @@
             </div>
         </div>
         <div class="row top-row">
-            <div class="col-md-6" style="padding-right: 0">
+            <div class="col-md-8" style="padding-right: 0">
                 <label for="description">Describe the attraction and why you loved it</label>
                 <?php
                 if (isset($getAttractionsData) && !empty($getAttractionsData)) {

@@ -1,7 +1,7 @@
 
-
-<div class="row" style="height: ">
-    <div class="col-md-8" style="padding-left: 0"> 
+<div class="container-fluid" style="margin: 0">
+<div class="row " style="height: ">
+    <div class="col-md-10" style="padding-left: 0"> 
         <form action="<?php echo base_url() . 'profile/blogs' ?>" style="width: 100%" method="get">
             <div class="row">
                 <div class="col-md-3" style="display: inline-block;padding-left: ">
@@ -36,7 +36,7 @@
                 </div>
 
             </div>
-            <div class="row">
+            <div class="row ">
                 <div class="col-md-4" style="padding-left: ">
                     <!--<label for="location" class="top-row">Location Tags*</label>-->
                     <select data-placeholder="Location Tags" class="location-mulitiple" name="locations[]" id="location" multiple="multiple" style="width:100%" data-tags='false'>      
@@ -67,8 +67,9 @@
     </div>
 </div>
 
-<div class="row blog-list" >
-    <table class="table table-striped" width="100%">
+<div class="row " >
+    <div class="col-md-11 ">
+    <table class="table table-striped blog-list" width="100%">
         <thead>
             <tr>
                 <th width="5%">Id#</th>
@@ -138,8 +139,8 @@
     
         </div>-->
 </div> 
-
-
+</div>
+</div>
 
 
 

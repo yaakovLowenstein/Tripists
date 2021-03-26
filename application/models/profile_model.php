@@ -254,9 +254,130 @@ class profile_model extends CI_Model {
         $this->db->delete($table);
         return true;
     }
- public function deleteMultipleById($table, $ids,$columnName) {
+
+    public function deleteMultipleById($table, $ids, $columnName) {
         $this->db->where_in($columnName, $ids);
         $this->db->delete($table);
         return true;
     }
+
+    public function getLikedBlogsByUser($userId, $searchstring) {
+        if (isset($searchstring['title'])) {
+            $this->db->like('blog_title', $searchstring['title']);
+        }
+        if (isset($searchstring['user'])) {
+            $this->db->where('b.user_id', $searchstring['user']);
+        }
+        if (isset($searchstring['state'])) {
+            $this->db->where('state', $searchstring['state']);
+        }
+        if (isset($searchstring['country'])) {
+            $this->db->where('country', $searchstring['country']);
+        }
+        if (isset($searchstring['continent'])) {
+            $this->db->where('continent', $searchstring['continent']);
+        }
+        //$this->db->where('user_id', $userId);
+        if (!empty($searchstring['blog_ids'])) {
+            $this->db->where_in('b.blog_id', $searchstring['blog_ids']);
+        }
+        $this->db->where('publish', 1);
+
+
+        $this->db->where('bl.user_id', $userId);
+        $this->db->select('*,co.name as country_name');
+        $this->db->from('blog_likes bl');
+        $this->db->join('blog b', "b.blog_id=bl.blog_id");
+        $this->db->join('users u', "u.id=b.user_id");
+        $this->db->join('countries co', "co.country_id=b.country", "left");
+        $this->db->join('states s', "s.state_id=b.state", "left");
+
+        $query = $this->db->get();
+        return $query->result_array();
+    }
+
+    public function getLikedAttractionsByUser($userId, $searchstring) {
+        if (isset($searchstring['title'])) {
+            $this->db->like('attr_name', $searchstring['title']);
+        }
+        if (isset($searchstring['user'])) {
+            $this->db->where('b.user_id', $searchstring['user']);
+        }
+        if (isset($searchstring['state'])) {
+            $this->db->where('state', $searchstring['state']);
+        }
+        if (isset($searchstring['country'])) {
+            $this->db->where('country', $searchstring['country']);
+        }
+        if (isset($searchstring['continent'])) {
+            $this->db->where('continent', $searchstring['continent']);
+        }
+        //$this->db->where('user_id', $userId);
+        if (!empty($searchstring['blog_ids'])) {
+            $this->db->where_in('b.blog_id', $searchstring['blog_ids']);
+        }
+        $this->db->where('publish', 1);
+
+
+        $this->db->where('al.user_id', $userId);
+        $this->db->select('*,co.name as country_name');
+        $this->db->from('attraction_likes al');
+        $this->db->join('blog_attractions ba', "ba.blog_attractions_id=al.blog_attractions_id");
+        $this->db->join('attractions a', "a.attractions_id = ba.attr_id");
+        $this->db->join('blog b', "b.blog_id=ba.blog_id");
+        $this->db->join('users u', "u.id=b.user_id");
+        $this->db->join('countries co', "co.country_id=b.country", "left");
+        $this->db->join('states s', "s.state_id=b.state", "left");
+
+        $query = $this->db->get();
+        //    print_r($query->result());die;
+        return $query->result_array();
+    }
+
+    public function getLikedRestaurantsByUser($userId, $searchstring) {
+        if (isset($searchstring['title'])) {
+            $this->db->like('rest_name', $searchstring['title']);
+        }
+        if (isset($searchstring['user'])) {
+            $this->db->where('b.user_id', $searchstring['user']);
+        }
+        if (isset($searchstring['state'])) {
+            $this->db->where('state', $searchstring['state']);
+        }
+        if (isset($searchstring['country'])) {
+            $this->db->where('country', $searchstring['country']);
+        }
+        if (isset($searchstring['continent'])) {
+            $this->db->where('continent', $searchstring['continent']);
+        }
+        //$this->db->where('user_id', $userId);
+        if (!empty($searchstring['blog_ids'])) {
+            $this->db->where_in('b.blog_id', $searchstring['blog_ids']);
+        }
+        $this->db->where('publish', 1);
+
+
+        $this->db->where('rl.user_id', $userId);
+        $this->db->select('*,co.name as country_name');
+        $this->db->from('restaurant_likes rl');
+        $this->db->join('blog_restaurants br', "br.blog_restaurants_id=rl.blog_restaurants_id");
+        $this->db->join('restaurants r', "r.restaurants_id = br.rest_id");
+        $this->db->join('blog b', "b.blog_id=br.blog_id");
+        $this->db->join('users u', "u.id=b.user_id");
+        $this->db->join('countries co', "co.country_id=b.country", "left");
+        $this->db->join('states s', "s.state_id=b.state", "left");
+
+        $query = $this->db->get();
+        // print_r($query->result());die;
+        return $query->result_array();
+    }
+
+    public function getBlogsSimilarToLikedBlogs($stateId, $countryId, $userId) {
+        $query = $this->db->query("CALL getBlogsSimilarToLikedBlogs($stateId,$countryId,$userId)");
+        $results = $query->result();
+        $query->next_result();
+        $query->free_result();
+        return $results;
+    }
+
 }
