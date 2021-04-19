@@ -68,6 +68,7 @@ class bloggers_model extends CI_Model {
         $user = $this->ion_auth->user()->row();
         $loggedinUser = !empty($user->id) ? $user->id : -1;
         //print_r($loggedinUser);die;
+        $this->db->distinct();
         $this->db->where('u.id', $userId);
         $this->db->where('publish', 1);
         $this->db->select("*,con.name as continent_name, co.name as country_name,u.name as full_name");
@@ -81,7 +82,7 @@ class bloggers_model extends CI_Model {
         $this->db->order_by("publish_date");
         $query = $this->db->get();
         //   print_r($this->db->last_query());
-
+        //print_r($query->result());die;
         return $query->result();
     }
 

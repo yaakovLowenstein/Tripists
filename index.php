@@ -1,4 +1,9 @@
 <?php
+if( ! ini_get('date.timezone') )
+{
+   date_default_timezone_set('America/New_York');
+}    date_default_timezone_set('America/New_York');
+
 /**
  * CodeIgniter
  *
@@ -63,6 +68,7 @@
  * Different environments will require different levels of error reporting.
  * By default development will show errors but testing and live will hide them.
  */
+        
 switch (ENVIRONMENT)
 {
 	case 'development':

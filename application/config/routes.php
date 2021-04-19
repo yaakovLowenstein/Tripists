@@ -72,6 +72,10 @@ $route['unset_blog_id'] = 'profile/unsetBlogId';
 $route['profile/liked/blogs'] = 'profile/likedBlogs';
 $route['profile/liked/attractions'] = 'profile/likedBlogs';
 $route['profile/liked/restaurants'] = 'profile/likedBlogs';
+$route['profile/subscriptions'] = 'profile/subscriptions';
+$route['profile/messages/list'] = 'profile/MessagesList';
+$route['profile/messages/details/(:num)'] = 'profile/Messages/$1';
+$route['profile/dashboard'] = 'profile/dashboard';
 
 
 

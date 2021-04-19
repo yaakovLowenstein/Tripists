@@ -58,6 +58,7 @@
 
             <div class="owl-carousel">
                 <?php for ($i = 0; $i < 10; $i++) { ?>
+
                     <div class="item">   
                         <a href="<?php echo base_url('blog-details/') . $getBloggersDetailsById[$i]->blog_id ?>">   
                             <div class="blog-image-carousel-con">
@@ -89,6 +90,9 @@
                             <option value="1">Yes</option>
                             <option selected="selected"value="0">No</option>
                         </select>
+                        <label style="display:block;margin-top: 15px;">Subject</label>
+                        <input class="form-control" style="width:70%" placeholder="Subject" id="subject"/>
+                        <span style="display:none;"class="error-span">This field is required</span>
                         <div style="display:block;">
                             <label>Type your message here</label>
                             <textarea name ='mess' id="message-text" class="message-txt" ></textarea>
@@ -137,48 +141,62 @@
         }
     });
 
+<?php if ($user->id != $bloggerDetails->user_id) { ?>
 
     $("#messgae-form").on('submit', function (event) {
         event.preventDefault();
 
         var mess = $('#message-text').val();
         var select = $('#is_this_blog').val();
-        // alert(select);
-        if (mess != '') {
-            if (<?php echo empty($this->ion_auth->user()->row()) ? 0 : 1; ?> == 1) {
-                $.ajax({
-                    url: '<?php echo base_url("blog-messages") ?>',
-                    cache: false,
-                    type: 'post',
-                    data: {message: mess, select: select, blog_id: '0'},
-                    datatype: 'json',
-                    success: function (result) { //we got the response
-                        $('#modal-header').text('Thank you');
-                        $('#modal-p').text("Your message has been sent.");
-                        $('#modal-btn').trigger('click');
-                        $('#message-text').val('');
-                        $('.error-span').hide();
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.log(JSON.stringify(jqXHR));
-                        console.log("AJAX error: " + textStatus + ' : ' + errorThrown);
-                    }
-                });
-            } else {
+        var subject = $('#subject').val();
 
-                $('#modal-p').text("You need to login in order to send a message.");
-                $('#modal-header').text('Login');
-                // $('#take-to-blog-btn').show();
-                $('#modal-btn').trigger('click');
-                $('#sign-in-form').show();
-                //$('.modal-footer').hide();
-                $('#modal-a').show();
-                $('.modal-content').height('425px')
+        // alert(select);
+
+            if (mess != '' && subject != '') {
+                if (<?php echo empty($this->ion_auth->user()->row()) ? 0 : 1; ?> == 1) {
+                    $.ajax({
+                        url: '<?php echo base_url("blog-messages") ?>',
+                        cache: false,
+                        type: 'post',
+                        data: {message: mess, select: select, blog_id: '0', subject: subject, to_blogger:<?php echo $this->uri->segment(3) ?>, from_user:<?php echo $this->ion_auth->user()->row()->id ?>, is_read_by_from: 1},
+                        datatype: 'json',
+                        success: function (result) { //we got the response
+                            $('#modal-header').text('Thank you');
+                            $('#modal-p').text("Your message has been sent.");
+                            $('#modal-btn').trigger('click');
+                            $('#message-text').val('');
+                            $('#subject').val('');
+
+                            $('.error-span').hide();
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            console.log(JSON.stringify(jqXHR));
+                            console.log("AJAX error: " + textStatus + ' : ' + errorThrown);
+                        }
+                    });
+                } else {
+
+                    $('#modal-p').text("You need to login in order to send a message.");
+                    $('#modal-header').text('Login');
+                    // $('#take-to-blog-btn').show();
+                    $('#modal-btn').trigger('click');
+                    $('#sign-in-form').show();
+                    //$('.modal-footer').hide();
+                    $('#modal-a').show();
+                    $('.modal-content').height('425px')
+                }
+            } else {
+                $('.error-span').show();
             }
-        } else {
-            $('.error-span').show();
-        }
-    });
+        });
+<?php } else { ?>
+        $("#messgae-form").on('submit', function (event) {
+            event.preventDefault();
+            $('#modal-header').text('Error');
+            $('#modal-p').text("You cannot send yourself a message.");
+            $('#modal-btn').trigger('click');
+        });
+<?php } ?>
     $(".subscribe").on('click', function (event) {
         event.preventDefault();
         if (<?php echo empty($this->ion_auth->user()->row()) ? 0 : 1; ?> == 1) {

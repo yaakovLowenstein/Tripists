@@ -1,9 +1,9 @@
-<?php //print_r($getBlogDetails[0]->blog_likes_id);die;                                                ?>
+<?php //print_r($getBlogDetails[0]->blog_likes_id);die;                                                     ?>
 
 <?php $user = $this->ion_auth->user()->row(); ?>
 <div class="fluid-containter">
     <div class="row top-row">
-        <div class="col-md-6 offset-md-2" style="padding-right: 20px;">     
+        <div class="col-md-7 offset-md-2" style="padding-right: 20px;">     
             <?php
             //     print_r($getBlogDetails[0]->blog_id);die;
             //  foreach ($getBlogDetails as $getBlogDetails) {
@@ -196,12 +196,17 @@
                     <p>Have a question or comment about this blog? Have a comment about something random? Send it here!</p>
                     <form class="top-row" id="messgae-form">
                         <label>Sending a message about this blog?</label>
-                        <select id='is_this_blog'>
+                        <select id='is_this_blog' class="form-control" style="width:10%; display: block;">
                             <option value="1">Yes</option>
                             <option value="0">No</option>
                         </select>
-                        <div style="display:block;">
-                            <label>Type your message here</label>
+                        <!--<div class="form-group">-->
+                        <label style="display:block;margin-top: 15px;">Subject</label>
+                        <input class="form-control" style="width:70%" placeholder="Subject" id="subject"/>
+                        <span style="display:none;"class="error-span">This field is required</span>
+                        <!--</div>-->
+                        <div style="display:block; ">
+                            <label style="margin-top: 15px">Type your message here</label>
                             <textarea name ='mess' id="message-text" class="message-txt" ></textarea>
                             <span style="display:none;"class="error-span">This field is required</span>
                         </div>
@@ -321,7 +326,7 @@
         // modal.find('.modal-body #title').val($('#myImgName' + num).text());
         //     /document.write(img.src);
         modal.find('#modal-image').attr("src", img.src);
-        //$('#modal-form').attr('action',"<?php //echo base_url() . 'profile/blogs/image/' . $blogId                                        ?>"  );
+        //$('#modal-form').attr('action',"<?php //echo base_url() . 'profile/blogs/image/' . $blogId                                             ?>"  );
         $('#title').text(name);
         if (desc == "") {
             desc = 'No Description';
@@ -394,35 +399,98 @@
         $("html, body").animate({scrollTop: 0}, "slow");
         return false;
     });
-    $("#messgae-form").on('submit', function (event) {
-        event.preventDefault();
+<?php if ($user->id != $getBlogDetails->user_id) { ?>
+        $("#messgae-form").on('submit', function (event) {
+            event.preventDefault();
 
-        var mess = $('#message-text').val();
-        var select = $('#is_this_blog').val();
-        // alert(select);
-        if (mess != '') {
+            var mess = $('#message-text').val();
+            var select = $('#is_this_blog').val();
+            var subject = $('#subject').val();
+
+            // alert(select);
+            if (mess != '' && subject != '') {
+                if (<?php echo empty($this->ion_auth->user()->row()) ? 0 : 1; ?> == 1) {
+                    $.ajax({
+                        url: '<?php echo base_url("blog-messages") ?>',
+                        cache: false,
+                        type: 'post',
+                        data: {message: mess, select: select, blog_id: '<?php echo $getBlogDetails->blog_id ?>', subject: subject, to_blogger:<?php echo $getBlogDetails->user_id ?>, from_user:<?php echo $this->ion_auth->user()->row()->id ?>, is_reply: 0, is_read_by_from: 1},
+                        datatype: 'json',
+                        success: function (result) { //we got the response
+                            $('#modal-header').text('Thank you');
+                            $('#modal-p').text("Your message has been sent.");
+                            $('#modal-btn').trigger('click');
+                            $('#message-text').val('');
+                            $('#subject').val('');
+                            $('.error-span').hide();
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            console.log(JSON.stringify(jqXHR));
+                            console.log("AJAX error: " + textStatus + ' : ' + errorThrown);
+                        }
+                    });
+                } else {
+
+                    $('#modal-p').text("You need to login in order to send a message.");
+                    $('#modal-header').text('Login');
+                    // $('#take-to-blog-btn').show();
+                    $('#modal-btn').trigger('click');
+                    $('#sign-in-form').show();
+                    //$('.modal-footer').hide();
+                    $('#modal-a').show();
+                    $('.modal-content').height('425px')
+                }
+            } else {
+                $('.error-span').show();
+            }
+        });
+<?php } else { ?>
+        $("#messgae-form").on('submit', function (event) {
+            event.preventDefault();
+            $('#modal-header').text('Error');
+            $('#modal-p').text("You cannot send yourself a message.");
+            $('#modal-btn').trigger('click');
+        });
+<?php } ?>
+        $("#abuse-button").on('click', function (event) {
+
             if (<?php echo empty($this->ion_auth->user()->row()) ? 0 : 1; ?> == 1) {
-                $.ajax({
-                    url: '<?php echo base_url("blog-messages") ?>',
-                    cache: false,
-                    type: 'post',
-                    data: {message: mess, select: select, blog_id: '<?php echo $getBlogDetails->blog_id ?>'},
-                    datatype: 'json',
-                    success: function (result) { //we got the response
-                        $('#modal-header').text('Thank you');
-                        $('#modal-p').text("Your message has been sent.");
-                        $('#modal-btn').trigger('click');
-                        $('#message-text').val('');
-                        $('.error-span').hide();
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.log(JSON.stringify(jqXHR));
-                        console.log("AJAX error: " + textStatus + ' : ' + errorThrown);
-                    }
-                });
+                if (!abuse) {
+                    $.ajax({
+                        url: '<?php echo base_url("abuse") ?>',
+                        cache: false,
+                        type: 'post',
+                        data: {counter: '<?php echo $getBlogDetails->blog_abuse_id ?>', blog_id: '<?php echo $getBlogDetails->blog_id ?>', userId: <?php echo!empty($user->id) ? $user->id : -1 ?>},
+                        datatype: 'json',
+                        success: function (result) { //we got the response
+                            if (result) {
+                                abuse = true;
+                                $('#modal-header').text('Thank you');
+                                $('#modal-p').text("Thank you for reporting the misconduct/ abuse.");
+                                $('#modal-btn').trigger('click');
+                                //  $('#message-text').val('');
+                                //  $('.error-span').hide();
+
+                            } else {
+                                $('#modal-header').text('Sorry');
+                                $('#modal-p').text("Can only submit one time per user.");
+                                $('#modal-btn').trigger('click');
+                            }
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            console.log(JSON.stringify(jqXHR));
+                            console.log("AJAX error: " + textStatus + ' : ' + errorThrown);
+                        }
+                    });
+                } else {
+                    $('#modal-header').text('Sorry');
+                    $('#modal-p').text("Can only submit one time per user.");
+                    $('#modal-btn').trigger('click');
+                }
             } else {
 
-                $('#modal-p').text("You need to login in order to send a message.");
+                //  $('#modal-p').text("You need to login in order to send a
+                $('#modal-p').text("You need to login to report abuse.");
                 $('#modal-header').text('Login');
                 // $('#take-to-blog-btn').show();
                 $('#modal-btn').trigger('click');
@@ -431,119 +499,56 @@
                 $('#modal-a').show();
                 $('.modal-content').height('425px')
             }
-        } else {
-            $('.error-span').show();
         }
-    });
-    $("#abuse-button").on('click', function (event) {
+        );</script>
+        <!--<script src="<?php echo base_url() . 'bower_components/amcharts4/core.js' ?>"></script>
+        <script src="<?php echo base_url() . 'bower_components/amcharts4/charts.js' ?>"></script>-->
+        <!--<script src="//cdn.amcharts.com/lib/4/core.js"></script>
+        <script src="//cdn.amcharts.com/lib/4/maps.js"></script>
+        <script src="//cdn.amcharts.com/lib/4/geodata/worldLow.js"></script>
 
-        if (<?php echo empty($this->ion_auth->user()->row()) ? 0 : 1; ?> == 1) {
-            if (!abuse) {
-                $.ajax({
-                    url: '<?php echo base_url("abuse") ?>',
-                    cache: false,
-                    type: 'post',
-                    data: {counter: '<?php echo $getBlogDetails->blog_abuse_id ?>', blog_id: '<?php echo $getBlogDetails->blog_id ?>', userId: <?php echo!empty($user->id) ? $user->id : -1 ?>},
-                    datatype: 'json',
-                    success: function (result) { //we got the response
-                        if (result) {
-                            abuse = true;
-                            $('#modal-header').text('Thank you');
-                            $('#modal-p').text("Thank you for reporting the misconduct/ abuse.");
-                            $('#modal-btn').trigger('click');
-                            //  $('#message-text').val('');
-                            //  $('.error-span').hide();
+        <script>
+        var map = am4core.create("mapdiv", am4maps.MapChart);
+        map.projection = new am4maps.projections.Miller();
 
-                        } else {
-                            $('#modal-header').text('Sorry');
-                            $('#modal-p').text("Can only submit one time per user.");
-                            $('#modal-btn').trigger('click');
+        </script>-->
+    <script src="https://cdn.amcharts.com/lib/4/core.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/maps.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/geodata/worldLow.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/geodata/usaLow.js"></script>
 
-                        }
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.log(JSON.stringify(jqXHR));
-                        console.log("AJAX error: " + textStatus + ' : ' + errorThrown);
-                    }
-                });
-            } else {
-                $('#modal-header').text('Sorry');
-                $('#modal-p').text("Can only submit one time per user.");
-                $('#modal-btn').trigger('click');
-            }
-        } else {
+        <!--<script src="https://cdn.amcharts.com/lib/4/charts.js"></script>-->
 
-            //  $('#modal-p').text("You need to login in order to send a
-            $('#modal-p').text("You need to login to report abuse.");
-            $('#modal-header').text('Login');
-            // $('#take-to-blog-btn').show();
-            $('#modal-btn').trigger('click');
-            $('#sign-in-form').show();
-            //$('.modal-footer').hide();
-            $('#modal-a').show();
-            $('.modal-content').height('425px')
-        }
-    }
-    );
-
-
-
-</script>
-<!--<script src="<?php echo base_url() . 'bower_components/amcharts4/core.js' ?>"></script>
-<script src="<?php echo base_url() . 'bower_components/amcharts4/charts.js' ?>"></script>-->
-<!--<script src="//cdn.amcharts.com/lib/4/core.js"></script>
-<script src="//cdn.amcharts.com/lib/4/maps.js"></script>
-<script src="//cdn.amcharts.com/lib/4/geodata/worldLow.js"></script>
-
-<script>
-var map = am4core.create("mapdiv", am4maps.MapChart);
-map.projection = new am4maps.projections.Miller();
-
-</script>-->
-<script src="https://cdn.amcharts.com/lib/4/core.js"></script>
-<script src="https://cdn.amcharts.com/lib/4/maps.js"></script>
-<script src="https://cdn.amcharts.com/lib/4/geodata/worldLow.js"></script>
-<script src="https://cdn.amcharts.com/lib/4/geodata/usaLow.js"></script>
-
-<!--<script src="https://cdn.amcharts.com/lib/4/charts.js"></script>-->
-
-<?php
-$countryCodes = "";
-foreach ($getCountriesByContinent as $country) {
-    $countryCodes .= "`" . $country->code . "`" . ",";
-}         //print_r("Hello".$countryCodes);die;
-?>
-<script>
-// Create map instance
+    <?php
+    $countryCodes = "";
+    foreach ($getCountriesByContinent as $country) {
+        $countryCodes .= "`" . $country->code . "`" . ",";
+    }         //print_r("Hello".$countryCodes);die;
+    ?>
+    <script>
+    // Create map instance
     var chart = am4core.create("chartdiv", am4maps.MapChart);
     //chart.maxZoomLevel = 1;
 
 
     chart.seriesContainer.draggable = false;
     chart.seriesContainer.resizable = false;
-// Set map definition
+    // Set map definition
     chart.geodata = am4geodata_worldLow;
-
-// Set projection
-<?php if ($getBlogDetails->country != "230") { ?>
+    // Set projection
+    <?php if ($getBlogDetails->country != "230") { ?>
         chart.projection = new am4maps.projections.Miller();
-
         // Create map polygon series
         var polygonSeries = chart.series.push(new am4maps.MapPolygonSeries());
-
         // Make map load polygon (like country names) data from GeoJSON
         polygonSeries.useGeodata = true;
-
         // Configure series
         var polygonTemplate = polygonSeries.mapPolygons.template;
         polygonTemplate.tooltipText = "{name}";
         polygonTemplate.fill = am4core.color("#74B266");
-
         // Create hover state and set alternative fill color
         var hs = polygonTemplate.states.create("hover");
         hs.properties.fill = am4core.color("#367B25");
-
-
         polygonSeries.include = [<?php echo $countryCodes ?>];
         polygonSeries.data = [{
                 "id": "<?php echo $getBlogDetails->country_code; ?>",
@@ -552,13 +557,11 @@ foreach ($getCountriesByContinent as $country) {
                 vcenter: "bottom",
                 "fill": am4core.color("#F05C5C")
             }];
-
         polygonTemplate.propertyFields.fill = "fill";
-<?php } ?>
+    <?php } ?>
 
-<?php if ($getBlogDetails->country == "230") { ?>
+    <?php if ($getBlogDetails->country == "230") { ?>
         chart.projection = new am4maps.projections.AlbersUsa();
-
         var usaSeries = chart.series.push(new am4maps.MapPolygonSeries());
         usaSeries.geodata = am4geodata_usaLow;
         var polygonTemplate = usaSeries.mapPolygons.template;
@@ -574,18 +577,17 @@ foreach ($getCountriesByContinent as $country) {
                 "fill": am4core.color("#F05C5C")
             }];
         polygonTemplate.propertyFields.fill = "fill";
-
-<?php } ?>
-</script>
-<script>
-    $(".subscribe").on('click', function (event) {
-        event.preventDefault();
-        if (<?php echo empty($this->ion_auth->user()->row()) ? 0 : 1; ?> == 1) {
-            $.ajax({
-                url: '<?php echo base_url("subscribe") ?>',
-                cache: false,
-                type: 'post',
-                data: {subscribe: <?php echo empty($getBlogDetails->blogger_id) ? 1 : 0 ?>, blogger_id: '<?php echo $getBlogDetails->user_id ?>', userId: <?php echo!empty($user->id) ? $user->id : -1 ?>},
+    <?php } ?>
+    </script>
+    <script>
+        $(".subscribe").on('click', function (event) {
+            event.preventDefault();
+            if (<?php echo empty($this->ion_auth->user()->row()) ? 0 : 1; ?> == 1) {
+                $.ajax({
+                    url: '<?php echo base_url("subscribe") ?>',
+                    cache: false,
+                    type: 'post',
+                    data: {subscribe: <?php echo empty($getBlogDetails->blogger_id) ? 1 : 0 ?>, blogger_id: '<?php echo $getBlogDetails->user_id ?>', userId: <?php echo!empty($user->id) ? $user->id : -1 ?>},
                 datatype: 'json',
                 success: function (response) {
 

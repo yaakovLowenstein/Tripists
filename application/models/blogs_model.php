@@ -103,7 +103,7 @@ class blogs_model extends CI_Model {
         $this->db->distinct();
         $this->db->where('b.blog_id', $id);
         $this->db->select('*,b.blog_id, br.description as rest_description, r.rest_name as rest_name,bp.description as photos_description,'
-                . 'ba.name as advice_name,ba.description as advice_description,con.name as continent_name, co.name as country_name,co.code as country_code,s.*,IFNULL(likes.TotalLikes, 0)as TotalLikes');
+                . 'ba.name as advice_name,ba.description as advice_description,con.name as continent_name, co.name as country_name,co.code as country_code,s.*,IFNULL(likes.TotalLikes, 0)as TotalLikes,b.clicked_count as totalClicks');
         $this->db->from('blog b');
         $this->db->join('users u', 'b.user_id=u.id');
         $this->db->join('continents con', 'b.continent=con.code', 'left');
@@ -124,7 +124,7 @@ class blogs_model extends CI_Model {
 //  $this->db->where('bl.user_id', $userId);
         // $this->db->join('blog_likes bl', 'u.id = bl.user_id', 'left');
         $query = $this->db->get();
-        //  print_r( $this->db->last_query());die;
+       //   print_r( $this->db->last_query());die;
         //  print_r($query->result_array()); die;
         return $query->result();
     }

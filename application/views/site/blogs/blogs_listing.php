@@ -12,7 +12,7 @@
                             ?>
                             <div class="col-md-3 col-sm-12" style="text-align: left">
                                 <a href="<?php echo base_url('blog-details/') . $blogs[$i + $j]['blog_id'] ?>">    <?php if (!empty($blogs[$i + $j]['cover_pic_path'])) { ?>
-                                        <div class="image-con-cover-thumb">  
+                                    <div class="image-con-cover-thumb" style="margin-bottom: 0">  
                                             <img class="blog-cover-image img-cover-thumb" src="<?php echo base_url() . $blogs[$i + $j]['cover_pic_path'] ?>">
                                         </div>
                                     <?php } else { ?> 

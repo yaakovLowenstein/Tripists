@@ -1,7 +1,10 @@
+
+<?php  $params = $_SERVER['QUERY_STRING']; ?>
+
 <div class="container-fluid">
     <div class="row">
-        <div class="offset-4 col-3 top-row">
-            <form method="post" action="<?php echo base_url('login'); ?>" class="border top-row ">
+        <div class="offset-4 col-4 top-row">
+            <form method="post" action="<?php echo base_url('login?').$params; ?>" class="border top-row ">
 
                 <h4>Login</h4>
                 <?php if ($this->session->flashdata('message')){

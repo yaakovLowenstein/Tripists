@@ -272,8 +272,8 @@ class Blogs extends CI_Controller {
         $data['getAllBLogsByUser'] = $this->blogs_model->getAllBLogsByUser($allBlogDetails[0]->id);
         $data['getLikedBlog'] = $this->blogs_model->getLikedBlog($id);
         $data['getCountriesByContinent'] = $this->function_model->getCountriesByContinent($allBlogDetails[0]->continent);
-
-        $this->countClicks($id, $allBlogDetails[0]->clicked_count);
+        //  print_r($id . " ".$allBlogDetails[0]->clicked_count );die;
+        $this->countClicks($id, $allBlogDetails[0]->totalClicks);
 
         $loArray = array();
         foreach ($data['getBlogLocationsDetails'] as $row) {
@@ -348,20 +348,48 @@ class Blogs extends CI_Controller {
 
         $aboutThisBlog = $this->input->post('select');
         $message = $this->input->post('message');
+        $subject = $this->input->post('subject');
+        $toBlogger = $this->input->post('to_blogger');
+        $fromUser = $this->input->post('from_user');
         $blogId = $this->input->post('blog_id');
+        $isReply = 0; // $this->input->post('is_reply');
+        $conversationId = $this->input->post('conversation_id');
+        $date = date_create();
+        $date = date_format($date, 'Y-m-d H:i:s');
+        $isReadByFrom =0;
+        
+        if (!empty($this->input->post('is_read_by_from'))) {
+            $isReadByFrom = $this->input->post('is_read_by_from');
+        }
+        if(empty($conversationId)){
+            $conversationId=0;
+        }
 //   $userId = $this->input->post('userId');
         // $liked = false;
         if ($aboutThisBlog == 1) {
             $insertData = array(
                 'blog_about_id' => $blogId,
-                "message" => $message
+                "message" => $message,
+                'subject' => $subject,
+                'from_id' => $fromUser,
+                'to_id' => $toBlogger,
+                'is_reply_from_blogger' => $isReply,
+                'date_sent' => $date,
+                'is_read_by_from' => $isReadByFrom
             );
             $this->blogs_model->insert('blog_messages', $insertData);
             //$liked = true;
         } else {
             $insertData = array(
                 'blog_about_id' => 0,
-                "message" => $message
+                "message" => $message,
+                'subject' => $subject,
+                'from_id' => $fromUser,
+                'to_id' => $toBlogger,
+                'is_reply_from_blogger' => $isReply,
+                'conversation_id' => $conversationId,
+                'date_sent' => $date,
+                'is_read_by_from' => $isReadByFrom
             );
             $this->blogs_model->insert('blog_messages', $insertData);
             //$liked = FALSE;
@@ -411,7 +439,7 @@ class Blogs extends CI_Controller {
         $data['main_content'] = 'site/blogs/attractions_descriptions.php';
         $this->load->view('lib-site/template', $data);
     }
-    
+
     public function restDescriptions($restId) {
         $data['getRestDescriptions'] = $this->blogs_model->getRestDescriptions($restId);
         $data['getRestaurantLikes'] = $this->blogs_model->getRestaurantLikes();

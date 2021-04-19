@@ -74,6 +74,7 @@ class Auth extends CI_Controller {
                 // check to see if the user is logging in
                 // check for "remember me"
                 $remember = (bool) $this->input->post('remember');
+                  //  print_r($this->input->get('url'));die;
 
                 if ($this->ion_auth->login($this->input->post('identity'), $this->input->post('password'), $remember)) {
                     //if the login is successful
@@ -84,7 +85,12 @@ class Auth extends CI_Controller {
                     if (!empty($this->input->get('fromPage'))) {
                         //        echo json_encode('ddd');
                         redirect($this->input->post('url_string') . '?redirect=yes');
-                    } else {
+                    } 
+                    else if (!empty($this->input->get('url'))){
+                       // die;
+                         redirect(base_url($this->input->get('url')), 'refresh');
+                    }
+                    else {
                         redirect('profile/index', 'refresh');
                     }
                 }

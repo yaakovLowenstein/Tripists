@@ -65,7 +65,7 @@ foreach ($getBlogCountries as $country) {
                 'id':'" . $country->code . "'," .
                 "'name':'" . $country->name . "'," .
                 "'url':'" . base_url() . "/blogs?country=" . $country->country_id . "&continent=" . $country->continent_code . "'" . "," .
-                "'fill': am4core.color('#F05C5C')
+                "'fill': am4core.color('#47c4e1')
                
     },"
 
@@ -77,7 +77,7 @@ foreach ($getBlogCountries as $country) {
                 'id':'US-" . $country->state_code . "'," .
                 "'name':'" . $country->state_name . "'," .
                 "'url':'" . base_url() . "/blogs?country=" . $country->country_id . "&continent=" . $country->continent_code."&state=".$country->state_id . "'" . "," .
-                "'fill': am4core.color('#F05C5C')
+                "'fill': am4core.color('#47c4e1')
                
     },"
 
@@ -99,7 +99,7 @@ $countryCodes = rtrim($countryCodes, ",");
     legend.padding(20, 20);
     legend.data = [{
             "name": "Blogs",
-            "fill": "#F05C5C"
+            "fill": "#47c4e1"
         }, {
             "name": "No Blogs",
             "fill": "#74B266"
